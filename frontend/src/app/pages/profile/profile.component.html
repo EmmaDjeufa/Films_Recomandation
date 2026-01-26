@@ -1,13 +1,6 @@
-<h2>Mon Profil</h2>
+<h2>Profil</h2>
 <form (ngSubmit)="saveProfile()">
-  <input type="text" [(ngModel)]="profileForm.value.name" name="name" placeholder="Nom">
-  <input type="password" [(ngModel)]="profileForm.value.password" name="password" placeholder="Nouveau mot de passe">
-  <input type="file" (change)="onFileChange($event)">
+  <input [(ngModel)]="profileForm.value.name" name="name" placeholder="Nom">
+  <input [(ngModel)]="profileForm.value.password" name="password" type="password" placeholder="Mot de passe">
   <button type="submit">Sauvegarder</button>
 </form>
-
-<h3>Mes thèmes</h3>
-<!-- Ici tu peux ajouter un multi-select de thèmes -->
-<button (click)="saveThemes()">Mettre à jour thèmes</button>
-
-<p>{{message}}</p>

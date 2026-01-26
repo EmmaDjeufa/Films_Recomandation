@@ -1,20 +1,16 @@
-import { Component, OnInit } from '@angular/core';
-import { UserService } from '../../core/user.service';
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { UserCardComponent } from '../../shared/user-card/user-card.component';
 
 @Component({
   selector: 'app-users-list',
-  template: `
-  <h2>Utilisateurs</h2>
-  <div *ngFor="let user of users">
-    <app-user-card [user]="user"></app-user-card>
-  </div>`
+  standalone: true,
+  imports: [CommonModule, UserCardComponent],
+  templateUrl: './users-list.component.html',
 })
-export class UsersListComponent implements OnInit {
-  users: any[] = [];
-
-  constructor(private userService: UserService) {}
-
-  ngOnInit() {
-    this.userService.getAllUsers().subscribe(res => this.users = res as any[]);
-  }
+export class UsersListComponent {
+  users = [
+    { name: 'Alice', themes: ['Action', 'Comédie'] },
+    { name: 'Bob', themes: ['Horreur'] }
+  ];
 }
