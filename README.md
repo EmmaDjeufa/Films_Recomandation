@@ -79,8 +79,8 @@ frontend/
 │   │   └─ admin/
 │   │       └─ admin-dashboard.component.ts
 │   │
-│   ├─ app-routing.module.ts
-│   └─ app.module.ts
+│   ├─ app.routes.ts
+│   └─ app.config.ts
 │
 ├─ assets/
 └─ environments/
