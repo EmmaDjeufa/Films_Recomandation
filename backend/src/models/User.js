@@ -1,41 +1,66 @@
-const pool = require('../config/db');
+// backend/src/models/User.js
+const supabase = require('../config/db'); // ton client Supabase
 
 const User = {
   create: async ({ email, password_hash, name }) => {
-    const res = await pool.query(
-      'INSERT INTO users(email, password_hash, name, role, is_verified, created_at, updated_at) VALUES($1,$2,$3,$4,$5,NOW(),NOW()) RETURNING *',
-      [email, password_hash, name, 'user', false]
-    );
-    return res.rows[0];
+    const { data, error } = await supabase
+      .from('users')
+      .insert([{ email, password_hash, name, role: 'user', is_verified: false }])
+      .select(); // retourne les colonnes insérées
+    if (error) throw error;
+    return data[0];
   },
 
   findByEmail: async (email) => {
-    const res = await pool.query('SELECT * FROM users WHERE email=$1', [email]);
-    return res.rows[0];
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email);
+    if (error) throw error;
+    return data[0];
   },
 
   findById: async (id) => {
-    const res = await pool.query('SELECT * FROM users WHERE id=$1', [id]);
-    return res.rows[0];
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', id);
+    if (error) throw error;
+    return data[0];
   },
 
   verifyEmail: async (id) => {
-    const res = await pool.query('UPDATE users SET is_verified=true WHERE id=$1 RETURNING *', [id]);
-    return res.rows[0];
+    const { data, error } = await supabase
+      .from('users')
+      .update({ is_verified: true })
+      .eq('id', id)
+      .select();
+    if (error) throw error;
+    return data[0];
   },
 
   updateProfile: async (id, { name, photo_url, password_hash }) => {
-    const res = await pool.query(
-      'UPDATE users SET name=$1, photo_url=$2, password_hash=$3, updated_at=NOW() WHERE id=$4 RETURNING *',
-      [name, photo_url, password_hash, id]
-    );
-    return res.rows[0];
+    const updates = {};
+    if (name) updates.name = name;
+    if (photo_url) updates.photo_url = photo_url;
+    if (password_hash) updates.password_hash = password_hash;
+
+    const { data, error } = await supabase
+      .from('users')
+      .update(updates)
+      .eq('id', id)
+      .select();
+    if (error) throw error;
+    return data[0];
   },
 
   getAll: async () => {
-    const res = await pool.query('SELECT id, name, email, photo_url, role FROM users');
-    return res.rows;
-  },
+    const { data, error } = await supabase
+      .from('users')
+      .select('id, name, email, photo_url, role');
+    if (error) throw error;
+    return data;
+  }
 };
 
 module.exports = User;
