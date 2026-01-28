@@ -1,3 +1,4 @@
+//user.controller.js
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const pool = require('../config/db');

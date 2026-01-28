@@ -1,10 +1,19 @@
 <div>
   <h2>Inscription</h2>
-  <input [(ngModel)]="name" placeholder="Nom">
-  <input [(ngModel)]="email" placeholder="Email">
-  <input [(ngModel)]="password" type="password" placeholder="Mot de passe">
-  <button (click)="register()">S'inscrire</button>
-  <p class="success">{{success}}</p>
-  <p class="error">{{error}}</p>
-  <p>Déjà inscrit ? <a routerLink="/login">Connexion</a></p>
+  <h2>Inscription</h2>
+
+<form [formGroup]="form" (ngSubmit)="register()">
+
+  <input formControlName="name" placeholder="Nom">
+
+  <input formControlName="email" placeholder="Email">
+
+  <input type="password" formControlName="password" placeholder="Mot de passe">
+
+  <button type="submit">S'inscrire</button>
+
+ 
+  <p>Déjà un compte ? <a routerLink="/login">Connexion</a></p>
+
+</form>
 </div>

@@ -1,24 +1,51 @@
 import { Component } from '@angular/core';
-import { AuthService } from '../../../core/auth.service';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
+import { AuthService } from '../../../core/auth.service'; // <- bien vérifier le chemin
 import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-register',
-  templateUrl: './register.component.html'
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
-  name = '';
-  email = '';
-  password = '';
-  error = '';
-  success = '';
 
-  constructor(private auth: AuthService, private router: Router) {}
+  form: FormGroup;
+  error = '';
+
+  constructor(
+    private fb: FormBuilder,
+    private auth: AuthService,
+    private router: Router
+  ) {
+    this.form = this.fb.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', Validators.required]
+    });
+  }
 
   register() {
-    this.auth.register({ name: this.name, email: this.email, password: this.password }).subscribe({
-      next: (res: any) => this.success = res.message,
-      error: (err) => this.error = err.error.message
+    if (this.form.invalid) {
+      this.error = 'Veuillez remplir tous les champs correctement';
+      return;
+    }
+
+    // Appel à l'API backend
+    this.auth.register(this.form.value).subscribe({
+      next: (res: any) => {
+        console.log('Inscription réussie:', res);
+        // Stocke l'utilisateur et redirige
+        this.auth.setUser(res);
+        this.router.navigate(['/profile']); // redirection après inscription
+      },
+      error: (err) => {
+        console.error('Erreur inscription:', err);
+        this.error = err.error?.message || 'Erreur serveur';
+      }
     });
   }
 }

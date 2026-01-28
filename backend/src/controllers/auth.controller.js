@@ -4,6 +4,8 @@ const jwt = require('../utils/jwt');
 const { sendVerificationEmail } = require('../utils/email');
 
 const register = async (req, res) => {
+  console.log('BODY reçu:', req.body);
+
   try {
     const { email, password, name } = req.body;
     const existing = await User.findByEmail(email);
@@ -17,7 +19,8 @@ const register = async (req, res) => {
 
     res.json({ message: 'Inscription réussie, vérifiez votre email.' });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error('Erreur register:', err);
+    res.status(500).json({ message: err.message || 'Erreur inconnue' });
   }
 };
 

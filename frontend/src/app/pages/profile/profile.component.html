@@ -1,6 +1,7 @@
-<h2>Profil</h2>
-<form (ngSubmit)="saveProfile()">
-  <input [(ngModel)]="profileForm.value.name" name="name" placeholder="Nom">
-  <input [(ngModel)]="profileForm.value.password" name="password" type="password" placeholder="Mot de passe">
-  <button type="submit">Sauvegarder</button>
-</form>
+<h2>Mon profil</h2>
+<img [src]="user.photo_url || 'assets/default-avatar.png'" width="80">
+<p>Nom : {{user.name}}</p>
+<p>Email : {{user.email}}</p>
+<div *ngFor="let theme of user.themes">
+  <app-theme-badge [name]="theme"></app-theme-badge>
+</div>

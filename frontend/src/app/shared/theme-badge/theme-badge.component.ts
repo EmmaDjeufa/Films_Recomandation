@@ -9,5 +9,5 @@ import { CommonModule } from '@angular/common';
   styleUrls: ['./theme-badge.component.scss']
 })
 export class ThemeBadgeComponent {
-  @Input() theme!: string; // ✅ déclarer le input
+  @Input() name: string = '';
 }
