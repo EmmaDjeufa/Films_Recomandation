@@ -9,7 +9,7 @@ import { ThemeBadgeComponent } from '../../shared/theme-badge/theme-badge.compon
   standalone: true,
   imports: [CommonModule, FormsModule, ThemeBadgeComponent],
   templateUrl: './profile.component.html',
-  styleUrls: ['./profile.component.scss']
+  styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent {
   user: any = {};

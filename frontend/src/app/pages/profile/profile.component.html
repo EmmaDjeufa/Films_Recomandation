@@ -1,7 +1,10 @@
-<h2>Mon profil</h2>
-<img [src]="user.photo_url || 'assets/default-avatar.png'" width="80">
-<p>Nom : {{user.name}}</p>
-<p>Email : {{user.email}}</p>
-<div *ngFor="let theme of user.themes">
-  <app-theme-badge [name]="theme"></app-theme-badge>
+<div class="profile-container">
+  <h2>Mon profil</h2>
+  <img [src]="user.photo_url || 'assets/default-avatar.png'" alt="Avatar">
+  <p>Nom : {{user.name}}</p>
+  <p>Email : {{user.email}}</p>
+
+  <div *ngIf="user.themes?.length > 0">
+    <app-theme-badge *ngFor="let theme of user.themes" [name]="theme"></app-theme-badge>
+  </div>
 </div>

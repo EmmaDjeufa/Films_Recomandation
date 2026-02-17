@@ -1,16 +1,19 @@
 <nav class="navbar">
+  <!-- Logo -->
   <div class="logo">
     <a routerLink="/films">ReckOMovies</a>
   </div>
 
+  <!-- Liens principaux -->
   <div class="links">
-    <a routerLink="/profile">Profil</a>
     <a routerLink="/users">Utilisateurs</a>
     <a routerLink="/films">Films</a>
+    <a routerLink="/profile">Profil</a>
     <a routerLink="/admin" *ngIf="auth.currentUser.value?.role==='admin'">Admin</a>
-  </div>
-
-  <div class="actions">
-    <button (click)="logout()">Logout</button>
+    <!-- Connexion / Inscription -->
+    <a routerLink="/login">Connexion</a>
+    <a routerLink="/register">Inscription</a>
+    <!-- Logout -->
+    <button *ngIf="auth.currentUser.value" (click)="logout()">Logout</button>
   </div>
 </nav>

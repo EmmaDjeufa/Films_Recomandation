@@ -1,0 +1,41 @@
+/* Container principal */
+.film-container {
+  max-width: 600px;
+  margin: 60px auto;
+  padding: 30px 25px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  font-family: "Inter", Arial, sans-serif;
+}
+
+/* Titre */
+.film-container h2 {
+  color: #1e40af; /* bleu foncé */
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+/* Liste des films */
+.film-container div {
+  padding: 10px 15px;
+  margin-bottom: 12px;
+  background-color: #f9fafb; /* gris très clair */
+  border-radius: 6px;
+  border: 1px solid #e5e7eb; /* léger contour */
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Effet hover sur les films */
+.film-container div:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Texte du film */
+.film-container p {
+  margin: 0;
+  font-size: 14px;
+  color: #374151; /* gris foncé */
+}

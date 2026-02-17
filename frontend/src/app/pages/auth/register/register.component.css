@@ -1,5 +1,5 @@
 /* Container global */
-.auth-container {
+div {
   max-width: 400px;
   margin: 60px auto;
   padding: 30px 25px;
@@ -10,7 +10,7 @@
 }
 
 /* Titres */
-.auth-container h2 {
+h2 {
   text-align: center;
   color: #1e40af; /* bleu foncé */
   margin-bottom: 25px;
@@ -18,16 +18,14 @@
 }
 
 /* Formulaire */
-.auth-container form,
-.auth-container > input,
-.auth-container > button {
+form {
   display: flex;
   flex-direction: column;
   gap: 15px;
 }
 
 /* Inputs */
-.auth-container input {
+input {
   padding: 10px 12px;
   font-size: 14px;
   border: 1px solid #d1d5db;
@@ -36,13 +34,13 @@
   transition: 0.2s;
 }
 
-.auth-container input:focus {
+input:focus {
   border-color: #2563eb;
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
 }
 
-/* Bouton */
-.auth-container button {
+/* Bouton de soumission */
+button[type="submit"] {
   padding: 10px 12px;
   font-size: 15px;
   font-weight: 500;
@@ -54,30 +52,30 @@
   transition: 0.2s;
 }
 
-.auth-container button:hover {
+button[type="submit"]:hover {
   background-color: #1d4ed8;
 }
 
-/* Message d’erreur */
-.auth-container .error {
+/* Message erreur */
+.error {
   color: #ef4444;
   font-size: 13px;
   text-align: center;
 }
 
-/* Lien de connexion / inscription */
-.auth-container p {
+/* Lien de connexion */
+p {
   text-align: center;
   font-size: 14px;
   margin-top: 10px;
 }
 
-.auth-container p a {
+p a {
   color: #2563eb;
   text-decoration: none;
   font-weight: 500;
 }
 
-.auth-container p a:hover {
+p a:hover {
   text-decoration: underline;
 }

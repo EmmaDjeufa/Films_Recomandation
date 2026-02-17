@@ -1,0 +1,49 @@
+/* Container principal */
+.users-container {
+  max-width: 600px;
+  margin: 60px auto;
+  padding: 30px 25px;
+  background-color: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  font-family: "Inter", Arial, sans-serif;
+}
+
+/* Titre */
+.users-container h2 {
+  color: #1e40af; /* bleu foncé */
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 25px;
+}
+
+/* Liste des utilisateurs */
+.user-card {
+  padding: 12px 15px;
+  margin-bottom: 12px;
+  background-color: #f9fafb; /* gris très clair */
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+/* Effet hover */
+.user-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+
+/* Texte des utilisateurs */
+.user-card p {
+  margin: 0;
+  font-size: 14px;
+  color: #374151; /* gris foncé */
+}
+
+/* Message "aucun utilisateur" */
+.users-container p.no-users {
+  text-align: center;
+  color: #6b7280; /* gris moyen */
+  font-style: italic;
+  margin-top: 20px;
+}
