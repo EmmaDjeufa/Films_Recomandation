@@ -4,6 +4,8 @@ Recomandation de films pour utilisateurs (Angular, Cloudinary, Postgress, Render
 node src/server.js
 npx nodemon src/server.js
 
+ng serve --open
+
 
 backend/
 │

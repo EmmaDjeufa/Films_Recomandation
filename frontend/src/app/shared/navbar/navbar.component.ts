@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common'; // ← nécessaire pour *ngIf
   standalone: true,
   imports: [CommonModule],
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss']
+  styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
   constructor(public auth: AuthService, private router: Router) {}
