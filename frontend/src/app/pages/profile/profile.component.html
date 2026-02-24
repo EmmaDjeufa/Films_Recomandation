@@ -1,10 +1,52 @@
 <div class="profile-container">
-  <h2>Mon profil</h2>
   <img [src]="user.photo_url || 'assets/default-avatar.png'" alt="Avatar">
-  <p>Nom : {{user.name}}</p>
-  <p>Email : {{user.email}}</p>
 
-  <div *ngIf="user.themes?.length > 0">
+  <h2>{{ user.name }}</h2>
+  <p>{{ user.email }}</p>
+
+  <!-- Thèmes favoris -->
+  <div class="themes-favorites">
     <app-theme-badge *ngFor="let theme of user.themes" [name]="theme"></app-theme-badge>
+  </div>
+
+  <!-- Mot de passe -->
+  <button (click)="togglePasswordForm()">
+    {{ showPasswordForm ? 'Annuler' : 'Modifier mot de passe' }}
+  </button>
+
+  <div *ngIf="showPasswordForm" class="password-form">
+    <input type="password" placeholder="Nouveau mot de passe" [(ngModel)]="newPassword">
+    <input type="password" placeholder="Confirmer mot de passe" [(ngModel)]="confirmPassword">
+    <button (click)="changePassword()">Valider</button>
+    <p class="error" *ngIf="passwordError">{{ passwordError }}</p>
+    <p class="success" *ngIf="passwordSuccess">{{ passwordSuccess }}</p>
+  </div>
+</div>
+
+<!-- Films favoris -->
+<div class="film-container" *ngIf="user.favoriteFilms.length > 0">
+  <h2>🎬 Vos films favoris</h2>
+
+  <!-- Filtres catégories -->
+  <div class="categories">
+    <button *ngFor="let category of categories"
+            (click)="selectedCategory = category"
+            [class.active]="selectedCategory === category">
+      {{ category }}
+    </button>
+  </div>
+
+  <!-- Grille des films -->
+  <div class="films-grid">
+    <div class="film-card" *ngFor="let film of filteredFilms()">
+      <div class="image-container">
+        <img [src]="film.image" [alt]="film.title">
+        <span class="badge">{{ film.theme }}</span>
+      </div>
+      <div class="film-info">
+        <h3>{{ film.title }}</h3>
+        <p>{{ film.description }}</p>
+      </div>
+    </div>
   </div>
 </div>

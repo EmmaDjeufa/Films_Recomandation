@@ -25,4 +25,13 @@ export class UserService {
   getAllUsers() {
     return this.http.get(`${this.apiUrl}/all`, this.getHeaders());
   }
+
+  // ✅ Ajouté
+  getProfile() {
+    return this.http.get(`${this.apiUrl}/profile`, this.getHeaders());
+  }
+
+  updatePassword(newPassword: string) {
+    return this.http.put(`${this.apiUrl}/password`, { password: newPassword }, this.getHeaders());
+  }
 }
