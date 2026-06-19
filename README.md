@@ -1,90 +1,128 @@
-# Films_Recomandation  En cours..
-Recomandation de films pour utilisateurs (Angular, Cloudinary, Postgress, Render)
 
+
+````
+# 🎬 Film Recommendation App
+
+Application de recommandation de films pour utilisateurs  
+(**Angular + Node.js + PostgreSQL + Cloudinary + Render**)
+
+---
+
+## 🚀 Lancer le projet
+
+### 🔧 Backend
+
+```bash
 node src/server.js
+````
+
+ou en mode dev :
+
+```bash
 npx nodemon src/server.js
+```
 
-ng serve --open
+---
 
+### 💻 Frontend (Angular)
 
-backend/
+```bash
+npx ng serve --open
+```
+
+---
+
+## 📁 Architecture du projet
+
+```
+Films_Recomandation
 │
-├─ src/
-│   ├─ controllers/
-│   │   ├─ auth.controller.js
-│   │   ├─ user.controller.js
-│   │   ├─ film.controller.js
-│   │   └─ admin.controller.js
+├── backend/
+│   ├── src/
+│   │   ├── controllers/
+│   │   │   ├── auth.controller.js
+│   │   │   ├── user.controller.js
+│   │   │   ├── film.controller.js
+│   │   │   └── admin.controller.js
+│   │   │
+│   │   ├── routes/
+│   │   │   ├── auth.routes.js
+│   │   │   ├── user.routes.js
+│   │   │   ├── film.routes.js
+│   │   │   └── admin.routes.js
+│   │   │
+│   │   ├── models/
+│   │   │   ├── User.js
+│   │   │   ├── Theme.js
+│   │   │   ├── Film.js
+│   │   │   └── UserTheme.js
+│   │   │
+│   │   ├── middlewares/
+│   │   │   ├── auth.middleware.js
+│   │   │   └── admin.middleware.js
+│   │   │
+│   │   ├── utils/
+│   │   │   ├── cloudinary.js
+│   │   │   ├── email.js
+│   │   │   └── jwt.js
+│   │   │
+│   │   ├── config/
+│   │   │   └── db.js
+│   │   │
+│   │   └── server.js
 │   │
-│   ├─ routes/
-│   │   ├─ auth.routes.js
-│   │   ├─ user.routes.js
-│   │   ├─ film.routes.js
-│   │   └─ admin.routes.js
-│   │
-│   ├─ models/
-│   │   ├─ User.js
-│   │   ├─ Theme.js
-│   │   ├─ Film.js
-│   │   └─ UserTheme.js
-│   │
-│   ├─ middlewares/
-│   │   ├─ auth.middleware.js
-│   │   └─ admin.middleware.js
-│   │
-│   ├─ utils/
-│   │   ├─ cloudinary.js
-│   │   ├─ email.js
-│   │   └─ jwt.js
-│   │
-│   ├─ config/
-│   │   └─ db.js
-│   │
-│   └─ server.js
+│   ├── package.json
+│   └── .env
 │
-├─ package.json
-└─ .env
-
-
-
-
-
-
-
-
-frontend/
-│
-├─ src/app/
-│   ├─ core/          # services globaux
-│   │   ├─ auth.service.ts
-│   │   ├─ user.service.ts
-│   │   └─ film.service.ts
+├── frontend/
+│   ├── src/
+│   │   ├── app/
+│   │   │
+│   │   ├── core/                 # Services globaux
+│   │   │   ├── auth.service.ts
+│   │   │   ├── user.service.ts
+│   │   │   └── film.service.ts
+│   │   │
+│   │   ├── shared/               # Composants réutilisables
+│   │   │   ├── navbar/
+│   │   │   ├── user-card/
+│   │   │   └── theme-badge/
+│   │   │
+│   │   ├── pages/
+│   │   │   ├── auth/
+│   │   │   │   ├── login/
+│   │   │   │   └── register/
+│   │   │   │
+│   │   │   ├── profile/
+│   │   │   │   ├── profile.component.ts
+│   │   │   │   └── profile.component.html
+│   │   │   │
+│   │   │   ├── users/
+│   │   │   │   └── users-list.component.ts
+│   │   │   │
+│   │   │   ├── films/
+│   │   │   │   └── film-recommendations.component.ts
+│   │   │   │
+│   │   │   └── admin/
+│   │   │       └── admin-dashboard.component.ts
+│   │   │
+│   │   ├── app.routes.ts
+│   │   └── app.config.ts
 │   │
-│   ├─ shared/        # composants réutilisables
-│   │   ├─ navbar/
-│   │   ├─ user-card/
-│   │   └─ theme-badge/
-│   │
-│   ├─ pages/
-│   │   ├─ auth/
-│   │   │   ├─ login/
-│   │   │   └─ register/
-│   │   │
-│   │   ├─ profile/
-│   │   │   ├─ profile.component.ts
-│   │   │   └─ profile.component.html
-│   │   │
-│   │   ├─ users/
-│   │   │   └─ users-list.component.ts
-│   │   │
-│   │   ├─ films/
-│   │   │   └─ film-recommendations.component.ts
-│   │   │
-│   │   └─ admin/
-│   │       └─ admin-dashboard.component.ts
-│   │
-│   ├─ app.routes.ts
-│   └─ app.config.ts
-│
-├─ assets/
-└─ environments/
+│   ├── assets/
+│   └── environments/
+```
+
+---
+
+## 🧠 Stack technique
+
+* **Frontend** : Angular
+* **Backend** : Node.js + Express
+* **Base de données** : PostgreSQL
+* **Stockage images** : Cloudinary
+* **Déploiement** : Render
+
+---
+
+```
