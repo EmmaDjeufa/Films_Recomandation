@@ -1,3 +1,4 @@
+//admin.controller.js
 const pool = require('../config/db');
 
 // Dashboard admin : stats simples

@@ -1,3 +1,4 @@
+//film.controller.js
 const pool = require('../config/db');
 
 // Ajouter un film (admin)

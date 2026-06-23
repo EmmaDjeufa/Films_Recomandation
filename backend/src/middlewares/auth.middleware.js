@@ -1,3 +1,4 @@
+//auth.middleware.js
 const jwt = require('../utils/jwt');
 
 const authMiddleware = (req, res, next) => {

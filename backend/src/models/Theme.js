@@ -1,3 +1,4 @@
+//Theme.js
 const pool = require('../config/db');
 
 const Theme = {

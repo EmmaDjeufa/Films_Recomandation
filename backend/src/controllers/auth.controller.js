@@ -1,3 +1,4 @@
+//auth.controller.js
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const jwt = require('../utils/jwt');
