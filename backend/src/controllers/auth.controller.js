@@ -5,7 +5,8 @@ const jwt = require('../utils/jwt');
 const { sendVerificationEmail } = require('../utils/email');
 
 const register = async (req, res) => {
-  console.log('BODY reçu:', req.body);
+    console.log('REGISTER APPELE');
+    console.log('BODY:', req.body);
 
   try {
     const { email, password, name } = req.body;

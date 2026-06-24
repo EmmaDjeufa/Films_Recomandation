@@ -6,7 +6,7 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:5000/api/auth';
+  private apiUrl = '/api/auth';
   public currentUser = new BehaviorSubject<any>(null);
 
   constructor(private http: HttpClient) { }

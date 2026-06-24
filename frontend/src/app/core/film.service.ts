@@ -7,7 +7,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root'
 })
 export class FilmService {
-  private apiUrl = 'http://localhost:5000/api/films';
+  private apiUrl = '/api/api/films';
 
   constructor(private http: HttpClient, private auth: AuthService) { }
 

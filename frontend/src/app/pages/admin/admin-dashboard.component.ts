@@ -17,6 +17,6 @@ export class AdminDashboardComponent implements OnInit {
 
   ngOnInit() {
     const headers = { Authorization: `Bearer ${this.auth.getToken()}` };
-    this.http.get('http://localhost:5000/api/admin/dashboard', { headers }).subscribe(res => this.stats = res);
+    this.http.get('/api/admin/dashboard', { headers }).subscribe(res => this.stats = res);
   }
 }
