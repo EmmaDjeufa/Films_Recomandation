@@ -5,11 +5,9 @@ const jwt = require('../utils/jwt');
 const { sendVerificationEmail } = require('../utils/email');
 
 const register = async (req, res) => {
-    console.log('REGISTER APPELE');
-    console.log('BODY:', req.body);
-
   try {
     const { email, password, name } = req.body;
+
     const existing = await User.findByEmail(email);
     if (existing) return res.status(400).json({ message: 'Email déjà utilisé' });
 
@@ -17,12 +15,19 @@ const register = async (req, res) => {
     const user = await User.create({ email, password_hash, name });
 
     const token = jwt.generateToken(user);
-    await sendVerificationEmail(user, token);
 
-    res.json({ message: 'Inscription réussie, vérifiez votre email.' });
+    // ❌ TEMPORAIRE: désactivé
+    // await sendVerificationEmail(user, token);
+
+    return res.json({
+      message: 'Inscription réussie',
+      user,
+      token
+    });
+
   } catch (err) {
     console.error('Erreur register:', err);
-    res.status(500).json({ message: err.message || 'Erreur inconnue' });
+    return res.status(500).json({ message: err.message });
   }
 };
 

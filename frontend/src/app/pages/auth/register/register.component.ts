@@ -1,3 +1,4 @@
+//register.component.ts
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, Validators, FormGroup } from '@angular/forms';
@@ -29,10 +30,13 @@ export class RegisterComponent {
   }
 
   register() {
+    console.log('BOUTON INSCRIPTION CLIQUE');
+
     if (this.form.invalid) {
       this.error = 'Veuillez remplir tous les champs correctement';
       return;
     }
+    console.log('DONNEES ENVOYEES', this.form.value);
 
     // Appel à l'API backend
     this.auth.register(this.form.value).subscribe({
