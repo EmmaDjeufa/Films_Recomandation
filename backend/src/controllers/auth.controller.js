@@ -9,18 +9,25 @@ const register = async (req, res) => {
     const { email, password, name } = req.body;
 
     const existing = await User.findByEmail(email);
-    if (existing) return res.status(400).json({ message: 'Email déjà utilisé' });
+    if (existing) {
+      return res.status(400).json({ message: 'Email déjà utilisé' });
+    }
 
     const password_hash = await bcrypt.hash(password, 10);
+    console.log("Début register");
+
     const user = await User.create({ email, password_hash, name });
+    console.log("Utilisateur créé");
 
     const token = jwt.generateToken(user);
+    console.log("Token créé");
 
-    // ❌ TEMPORAIRE: désactivé
-    // await sendVerificationEmail(user, token);
+    // Envoi du mail de vérification
+    await sendVerificationEmail(user, token);
+    console.log("Email envoyé");
 
     return res.json({
-      message: 'Inscription réussie',
+      message: 'Inscription réussie. Vérifiez votre boîte mail.',
       user,
       token
     });
