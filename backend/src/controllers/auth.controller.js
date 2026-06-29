@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const jwt = require('../utils/jwt');
 const { sendVerificationEmail } = require('../utils/email');
+const verifyCode = async (...);
 
 const register = async (req, res) => {
   try {
@@ -16,27 +17,67 @@ const register = async (req, res) => {
     const password_hash = await bcrypt.hash(password, 10);
     console.log("Début register");
 
-    const user = await User.create({ email, password_hash, name });
+    //const token = jwt.generateToken(user);
+    const verificationCode = Math.floor(
+    100000 + Math.random() * 900000
+    ).toString();
+
+    const verificationExpires = new Date(
+    Date.now() + 15 * 60 * 1000
+    );
+    console.log("Token créé"); 
+
+    const user = await User.create({ email, password_hash, name, verification_code: verificationCode, verification_expires: verificationExpires });
     console.log("Utilisateur créé");
 
-    const token = jwt.generateToken(user);
-    console.log("Token créé");
-
     // Envoi du mail de vérification
-    await sendVerificationEmail(user, token);
+    sendVerificationEmail(
+      user.email,
+      verificationCode
+    );
     console.log("Email envoyé");
 
     return res.json({
       message: 'Inscription réussie. Vérifiez votre boîte mail.',
-      user,
-      token
+      email:user.email
     });
+    
+    if(!user){
 
+      return res.status(404).json({
+      message:"Utilisateur introuvable"
+      });
+
+      }
+      if(user.verification_code!==code){
+
+      return res.status(400).json({
+      message:"Code incorrect"
+      });
+
+      }
+    if(
+      new Date()>user.verification_expires
+      ){
+
+      return res.status(400).json({
+      message:"Code expiré"
+      });
+
+      }
+      await User.verifyEmail(user.id);
+      res.json({
+      message:"Email vérifié"
+      });
   } catch (err) {
     console.error('Erreur register:', err);
     return res.status(500).json({ message: err.message });
   }
 };
+
+
+
+
 
 const login = async (req, res) => {
   try {

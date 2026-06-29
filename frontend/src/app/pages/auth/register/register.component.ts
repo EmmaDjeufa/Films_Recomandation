@@ -29,27 +29,49 @@ export class RegisterComponent {
     });
   }
 
-  register() {
-    console.log('BOUTON INSCRIPTION CLIQUE');
+ register(){
 
-    if (this.form.invalid) {
-      this.error = 'Veuillez remplir tous les champs correctement';
-      return;
+    if(this.form.invalid){
+
+        this.error="Tous les champs sont obligatoires";
+
+        return;
+
     }
-    console.log('DONNEES ENVOYEES', this.form.value);
 
-    // Appel à l'API backend
-    this.auth.register(this.form.value).subscribe({
-      next: (res: any) => {
-        console.log('Inscription réussie:', res);
-        // Stocke l'utilisateur et redirige
-        this.auth.setUser(res);
-        this.router.navigate(['/profile']); // redirection après inscription
-      },
-      error: (err) => {
-        console.error('Erreur inscription:', err);
-        this.error = err.error?.message || 'Erreur serveur';
-      }
+    this.auth.register(
+
+        this.form.value
+
+    ).subscribe({
+
+        next:(res:any)=>{
+
+            this.router.navigate(
+
+                ["/verify"],
+
+                {
+
+                    queryParams:{
+
+                        email:this.form.value.email
+
+                    }
+
+                }
+
+            );
+
+        },
+
+        error:(err)=>{
+
+            this.error=err.error.message;
+
+        }
+
     });
-  }
+
+}
 }

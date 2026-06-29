@@ -125,4 +125,35 @@ Films_Recomandation
 
 ---
 
+### (Notes de l'architecture d'inscription)
+
+Utilisateur
+      │
+      │ Inscription
+      ▼
+Express
+      │
+      ├── crée l'utilisateur
+      ├── génère un code 482913
+      ├── enregistre ce code en BD
+      └── envoie le code par Brevo
+                │
+                ▼
+        email utilisateur
+
+Utilisateur
+      │
+      │ saisit 482913
+      ▼
+Angular
+      │
+      ▼
+Express
+      │
+      ├── compare le code
+      ├── vérifie la date
+      └── is_verified = true
+
+Connexion autorisée
+
 ```

@@ -19,10 +19,32 @@ export class LoginComponent {
 
   constructor(private auth: AuthService, private router: Router) {}
 
-  login() {
-    this.auth.login({ email:this.email, password:this.password }).subscribe({
-      next: (res:any) => { this.auth.setUser(res); this.router.navigate(['/profile']); },
-      error: (err) => this.error = err.error.message
+  login(){
+
+    this.auth.login({
+
+        email:this.email,
+
+        password:this.password
+
+    }).subscribe({
+
+        next:(res:any)=>{
+
+            this.auth.setUser(res);
+
+            this.router.navigate(["/profile"]);
+
+        },
+
+        error:(err)=>{
+
+            this.error=err.error.message;
+
+        }
+
     });
-  }
+
+}
+  
 }

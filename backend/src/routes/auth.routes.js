@@ -1,10 +1,22 @@
 //auth.routes.js
-const express = require('express');
-const router = express.Router();
-const { register, login, verifyEmail } = require('../controllers/auth.controller');
+const express = require("express");
 
-router.post('/register', register);
-router.post('/login', login);
-router.get('/verify/:token', verifyEmail);
+const router = express.Router();
+
+const {
+
+    register,
+
+    login,
+
+    verifyCode
+
+} = require("../controllers/auth.controller");
+
+router.post("/register", register);
+
+router.post("/login", login);
+
+router.post("/verify-code", verifyCode);
 
 module.exports = router;

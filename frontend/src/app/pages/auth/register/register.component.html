@@ -1,19 +1,36 @@
 <!--register.component.html-->
-<div>
-  <h2>Inscription</h2>
+<h2>Vérification du compte</h2>
 
-<form [formGroup]="form" (ngSubmit)="register()">
+<p>
 
-  <input formControlName="name" placeholder="Nom">
+Un code a été envoyé à :
 
-  <input formControlName="email" placeholder="Email">
+<br>
 
-  <input type="password" formControlName="password" placeholder="Mot de passe">
+<b>{{email}}</b>
 
-  <button type="submit">S'inscrire</button>
+</p>
 
- 
-  <p>Déjà un compte ? <a routerLink="/login">Connexion</a></p>
+<input
 
-</form>
-</div>
+type="text"
+
+[(ngModel)]="code"
+
+placeholder="Code à 6 chiffres">
+
+<br><br>
+
+<button
+
+(click)="verify()">
+
+Valider
+
+</button>
+
+<p>
+
+{{message}}
+
+</p>
