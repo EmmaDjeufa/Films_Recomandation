@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth.service';
 import { RouterModule } from '@angular/router';
-import { CommonModule } from '@angular/common'; // ← nécessaire pour *ngIf
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-navbar',
@@ -12,10 +12,30 @@ import { CommonModule } from '@angular/common'; // ← nécessaire pour *ngIf
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
-  constructor(public auth: AuthService, private router: Router) {}
+
+  menuOpen = false;
+
+  constructor(
+    public auth: AuthService,
+    private router: Router
+  ) {}
 
   logout() {
     this.auth.logout();
     this.router.navigate(['/login']);
+    this.menuOpen = false;
   }
+
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  closeMenu() {
+    this.menuOpen = false;
+  }
+
+  isConnected(): boolean {
+    return !!this.auth.currentUser.value;
+  }
+
 }

@@ -1,19 +1,87 @@
 <nav class="navbar">
-  <!-- Logo -->
+
   <div class="logo">
-    <a routerLink="/films">ReckOMovies</a>
+    <a routerLink="/films">🎬 ReckOMovies</a>
   </div>
 
-  <!-- Liens principaux -->
-  <div class="links">
-    <a routerLink="/users">Utilisateurs</a>
-    <a routerLink="/films">Films</a>
-    <a routerLink="/profile">Profil</a>
-    <a routerLink="/admin" *ngIf="auth.currentUser.value?.role==='admin'">Admin</a>
-    <!-- Connexion / Inscription -->
-    <a routerLink="/login">Connexion</a>
-    <a routerLink="/register">Inscription</a>
-    <!-- Logout -->
-    <button *ngIf="auth.currentUser.value" (click)="logout()">Logout</button>
+  <button class="hamburger"
+          (click)="toggleMenu()">
+    ☰
+  </button>
+
+  <div class="links"
+       [class.open]="menuOpen">
+
+    <a routerLink="/films"
+       (click)="closeMenu()">
+      Films
+    </a>
+
+    <!-- Utilisateurs -->
+
+    <a *ngIf="isConnected()"
+       routerLink="/users"
+       (click)="closeMenu()">
+      Utilisateurs
+    </a>
+
+    <span
+      *ngIf="!isConnected()"
+      class="disabled-link"
+      title="Connectez-vous pour accéder aux utilisateurs">
+      🔒 Utilisateurs
+    </span>
+
+    <!-- Profil -->
+
+    <a *ngIf="isConnected()"
+       routerLink="/profile"
+       (click)="closeMenu()">
+      Profil
+    </a>
+
+    <span
+      *ngIf="!isConnected()"
+      class="disabled-link"
+      title="Connectez-vous pour accéder à votre profil">
+      🔒 Profil
+    </span>
+
+    <!-- Admin -->
+
+    <a
+      *ngIf="auth.currentUser.value?.role==='admin'"
+      routerLink="/admin"
+      (click)="closeMenu()">
+      Admin
+    </a>
+
+    <!-- Connexion -->
+
+    <a
+      *ngIf="!isConnected()"
+      routerLink="/login"
+      (click)="closeMenu()">
+      Connexion
+    </a>
+
+    <!-- Inscription -->
+
+    <a
+      *ngIf="!isConnected()"
+      routerLink="/register"
+      (click)="closeMenu()">
+      Inscription
+    </a>
+
+    <!-- Déconnexion -->
+
+    <button
+      *ngIf="isConnected()"
+      (click)="logout()">
+      Déconnexion
+    </button>
+
   </div>
+
 </nav>

@@ -27,6 +27,74 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const getProfile = async (req, res) => {
+  try {
+
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "Utilisateur introuvable"
+      });
+    }
+
+    res.json(user);
+
+  } catch (err) {
+
+    res.status(500).json({
+      message: err.message
+    });
+
+  }
+};
+
+const updatePassword = async (req, res) => {
+
+  try {
+
+    const password_hash = await bcrypt.hash(
+
+      req.body.password,
+
+      10
+
+    );
+
+    const user = await User.updateProfile(
+
+      req.user.id,
+
+      {
+
+        password_hash
+
+      }
+
+    );
+
+    res.json({
+
+      message: "Mot de passe modifié",
+
+      user
+
+    });
+
+  }
+
+  catch(err){
+
+    res.status(500).json({
+
+      message: err.message
+
+    });
+
+  }
+
+};
+
 // Ajouter/modifier thèmes préférés
 const updateThemes = async (req, res) => {
   try {
@@ -69,4 +137,4 @@ const listUsers = async (req, res) => {
   }
 };
 
-module.exports = { updateProfile, updateThemes, listUsers };
+module.exports = { updateProfile, updateThemes, listUsers, getProfile, updatePassword, listUsers };

@@ -3,109 +3,253 @@ const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const jwt = require('../utils/jwt');
 const { sendVerificationEmail } = require('../utils/email');
-const verifyCode = async (...);
 
+/**
+ * ===========================
+ * INSCRIPTION
+ * ===========================
+ */
 const register = async (req, res) => {
   try {
+
     const { email, password, name } = req.body;
 
+    // Vérifier si l'utilisateur existe déjà
     const existing = await User.findByEmail(email);
+
     if (existing) {
-      return res.status(400).json({ message: 'Email déjà utilisé' });
+      return res.status(400).json({
+        message: 'Email déjà utilisé'
+      });
     }
 
+    // Hash du mot de passe
     const password_hash = await bcrypt.hash(password, 10);
-    console.log("Début register");
 
-    //const token = jwt.generateToken(user);
+    // Génération du code de vérification
     const verificationCode = Math.floor(
-    100000 + Math.random() * 900000
+      100000 + Math.random() * 900000
     ).toString();
 
+    // Expiration dans 15 minutes
     const verificationExpires = new Date(
-    Date.now() + 15 * 60 * 1000
+      Date.now() + 15 * 60 * 1000
     );
-    console.log("Token créé"); 
 
-    const user = await User.create({ email, password_hash, name, verification_code: verificationCode, verification_expires: verificationExpires });
-    console.log("Utilisateur créé");
+    // Création de l'utilisateur
+    const user = await User.create({
 
-    // Envoi du mail de vérification
-    sendVerificationEmail(
-      user.email,
-      verificationCode
-    );
-    console.log("Email envoyé");
+      email,
 
-    return res.json({
-      message: 'Inscription réussie. Vérifiez votre boîte mail.',
-      email:user.email
+      password_hash,
+
+      name,
+
+      verification_code: verificationCode,
+
+      verification_expires: verificationExpires
+
     });
-    
-    if(!user){
+
+    // Envoi du code par email
+    await sendVerificationEmail(
+
+      user.email,
+
+      verificationCode
+
+    );
+
+    return res.status(201).json({
+
+      message: "Compte créé. Vérifiez votre adresse email.",
+
+      email: user.email
+
+    });
+
+  } catch (err) {
+
+    console.error(err);
+
+    return res.status(500).json({
+
+      message: err.message
+
+    });
+
+  }
+};
+
+
+/**
+ * ===========================
+ * VERIFICATION DU CODE
+ * ===========================
+ */
+const verifyCode = async (req, res) => {
+
+  try {
+
+    const { email, code } = req.body;
+
+    // Recherche de l'utilisateur
+    const user = await User.findByEmail(email);
+
+    if (!user) {
 
       return res.status(404).json({
-      message:"Utilisateur introuvable"
+
+        message: "Utilisateur introuvable"
+
       });
 
-      }
-      if(user.verification_code!==code){
+    }
+
+    // Vérifier le code
+    if (user.verification_code !== code) {
 
       return res.status(400).json({
-      message:"Code incorrect"
+
+        message: "Code incorrect"
+
       });
 
-      }
-    if(
-      new Date()>user.verification_expires
-      ){
+    }
+
+    // Vérifier l'expiration
+    if (new Date() > user.verification_expires) {
 
       return res.status(400).json({
-      message:"Code expiré"
+
+        message: "Le code a expiré"
+
       });
 
-      }
-      await User.verifyEmail(user.id);
-      res.json({
-      message:"Email vérifié"
-      });
-  } catch (err) {
-    console.error('Erreur register:', err);
-    return res.status(500).json({ message: err.message });
+    }
+
+    // Valider le compte
+    await User.verifyEmail(user.id);
+
+    return res.json({
+
+      message: "Email vérifié avec succès"
+
+    });
+
   }
+
+  catch (err) {
+
+    console.error(err);
+
+    return res.status(500).json({
+
+      message: err.message
+
+    });
+
+  }
+
 };
 
 
-
-
-
+/**
+ * ===========================
+ * CONNEXION
+ * ===========================
+ */
 const login = async (req, res) => {
+
   try {
+
     const { email, password } = req.body;
+
     const user = await User.findByEmail(email);
-    if (!user) return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
 
-    const match = await bcrypt.compare(password, user.password_hash);
-    if (!match) return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
+    if (!user) {
 
-    if (!user.is_verified) return res.status(403).json({ message: 'Email non vérifié' });
+      return res.status(400).json({
+
+        message: "Email ou mot de passe incorrect"
+
+      });
+
+    }
+
+    const match = await bcrypt.compare(
+
+      password,
+
+      user.password_hash
+
+    );
+
+    if (!match) {
+
+      return res.status(400).json({
+
+        message: "Email ou mot de passe incorrect"
+
+      });
+
+    }
+
+    if (!user.is_verified) {
+
+      return res.status(403).json({
+
+        message: "Veuillez vérifier votre adresse email."
+
+      });
+
+    }
 
     const token = jwt.generateToken(user);
-    res.json({ token, user: { id: user.id, email: user.email, name: user.name, role: user.role, photo_url: user.photo_url } });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
+
+    return res.json({
+
+      token,
+
+      user: {
+
+        id: user.id,
+
+        email: user.email,
+
+        name: user.name,
+
+        role: user.role,
+
+        photo_url: user.photo_url
+
+      }
+
+    });
+
   }
+
+  catch (err) {
+
+    console.error(err);
+
+    return res.status(500).json({
+
+      message: err.message
+
+    });
+
+  }
+
 };
 
-const verifyEmail = async (req, res) => {
-  try {
-    const { token } = req.params;
-    const decoded = jwt.verifyToken(token);
-    const user = await User.verifyEmail(decoded.id);
-    res.json({ message: 'Email vérifié avec succès', user });
-  } catch (err) {
-    res.status(400).json({ message: 'Token invalide ou expiré' });
-  }
-};
 
-module.exports = { register, login, verifyEmail };
+module.exports = {
+
+  register,
+
+  verifyCode,
+
+  login
+
+};

@@ -1,53 +1,110 @@
-.navbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 30px;
-  height: 65px;
-  background: #ffffff;
-  border-bottom: 1px solid #e5e7eb;
-  font-family: Arial, sans-serif;
+.navbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#fff;
+    border-bottom:1px solid #ddd;
+    padding:15px 25px;
+    position:relative;
 }
 
-.logo a {
-  font-size: 22px;
-  font-weight: bold;
-  color: #2563eb;
-  text-decoration: none;
+.logo a{
+    text-decoration:none;
+    color:#2563eb;
+    font-size:24px;
+    font-weight:bold;
 }
 
-.links {
-  display: flex;
-  gap: 15px;
-  align-items: center;
+.links{
+    display:flex;
+    gap:15px;
+    align-items:center;
 }
 
-.links a {
-  text-decoration: none;
-  color: #374151;
-  font-weight: 500;
-  padding: 6px 12px;
-  border-radius: 6px;
-  transition: 0.2s;
+.links a{
+    text-decoration:none;
+    color:#374151;
+    padding:8px 14px;
+    border-radius:6px;
+    transition:.25s;
 }
 
-.links a:hover {
-  background: #e0f2fe;
-  color: #1e40af;
+.links a:hover{
+    background:#e0f2fe;
+    color:#1e40af;
 }
 
-.links button {
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  border: none;
-  cursor: pointer;
-  background: #ef4444;
-  color: white;
-  transition: 0.2s;
+.links button{
+    background:#ef4444;
+    color:white;
+    border:none;
+    border-radius:6px;
+    padding:8px 15px;
+    cursor:pointer;
 }
 
-.links button:hover {
-  background: #dc2626;
+.links button:hover{
+    background:#dc2626;
+}
+
+.disabled-link{
+    color:#9ca3af;
+    cursor:not-allowed;
+    padding:8px 14px;
+}
+
+.hamburger{
+    display:none;
+    background:none;
+    border:none;
+    font-size:30px;
+    cursor:pointer;
+}
+
+/* ----------------------------- */
+/* Responsive                    */
+/* ----------------------------- */
+
+@media(max-width:768px){
+
+    .hamburger{
+        display:block;
+    }
+
+    .links{
+
+        display:none;
+
+        position:absolute;
+
+        top:70px;
+
+        left:0;
+
+        width:100%;
+
+        background:white;
+
+        flex-direction:column;
+
+        padding:20px;
+
+        border-top:1px solid #ddd;
+
+        box-shadow:0 4px 10px rgba(0,0,0,.1);
+    }
+
+    .links.open{
+        display:flex;
+    }
+
+    .links a,
+    .links button,
+    .disabled-link{
+
+        width:100%;
+
+        text-align:center;
+    }
+
 }

@@ -1,0 +1,35 @@
+<h2>Vérification du compte</h2>
+
+<p>
+
+Un code a été envoyé à :
+
+<br>
+
+<b>{{email}}</b>
+
+</p>
+
+<input
+
+type="text"
+
+[(ngModel)]="code"
+
+placeholder="Code à 6 chiffres">
+
+<br><br>
+
+<button
+
+(click)="verify()">
+
+Valider
+
+</button>
+
+<p>
+
+{{message}}
+
+</p>
