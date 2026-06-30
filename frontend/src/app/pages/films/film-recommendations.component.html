@@ -1,32 +1,23 @@
-<div class="film-container">
-  <h2>🎬 Recommandations de films</h2>
+<h2>🎬 Films</h2>
 
-  <!-- Filtres catégories -->
-  <div class="categories">
-    <button 
-      *ngFor="let category of categories"
-      (click)="selectedCategory = category"
-      [class.active]="selectedCategory === category">
-      {{ category }}
+<div class="filters">
+  <button (click)="loadPopular()">Populaires</button>
+  <button (click)="loadTopRated()">Top</button>
+  <button (click)="loadUpcoming()">À venir</button>
+</div>
+
+<div class="grid">
+  <div class="card" *ngFor="let film of films">
+
+    <img [src]="'https://image.tmdb.org/t/p/w500' + film.poster_path">
+
+    <h3>{{ film.title }}</h3>
+
+    <p>{{ film.overview }}</p>
+
+    <button (click)="addFavorite(film)">
+      ❤️ Favori
     </button>
-  </div>
 
-  <!-- Grille de films -->
-  <div class="films-grid">
-    <div 
-      class="film-card" 
-      *ngFor="let film of filteredFilms()">
-
-      <div class="image-container">
-        <img [src]="film.image" [alt]="film.title">
-        <span class="badge">{{ film.theme }}</span>
-      </div>
-
-      <div class="film-info">
-        <h3>{{ film.title }}</h3>
-        <p>{{ film.description }}</p>
-      </div>
-
-    </div>
   </div>
 </div>

@@ -1,5 +1,6 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FilmService } from '../../core/film.service';
 
 @Component({
   selector: 'app-film-recommendations',
@@ -8,48 +9,71 @@ import { CommonModule } from '@angular/common';
   templateUrl: './film-recommendations.component.html',
   styleUrls: ['./film-recommendations.component.css']
 })
-export class FilmRecommendationsComponent {
+export class FilmRecommendationsComponent implements OnInit {
 
-  categories = ['Tous', 'Action', 'Comédie', 'Science-Fiction', 'Drame'];
-  selectedCategory = 'Tous';
+  films: any[] = [];
+  searchQuery = '';
+  favorites: any[] = [];
 
-  films = [
-    {
-      title: 'Inception',
-      theme: 'Science-Fiction',
-      image: 'https://m.media-amazon.com/images/I/51EG732BV3L.jpg',
-      description: 'Un thriller sur les rêves et la manipulation mentale.'
-    },
-    {
-      title: 'The Dark Knight',
-      theme: 'Action',
-      image: 'https://image.tmdb.org/t/p/w500/qJ2tW6WMUDux911r6m7haRef0WH.jpg',
-      description: 'Batman affronte le Joker dans un duel légendaire.'
-    },
-    {
-      title: 'Intouchables',
-      theme: 'Comédie',
-      image: 'https://image.tmdb.org/t/p/w500/323BP0itpxTsO0skTwdnVmf7YC9.jpg',
-      description: 'Une amitié improbable pleine d’émotions.'
-    },
-    {
-      title: 'Interstellar',
-      theme: 'Science-Fiction',
-      image: 'https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg',
-      description: 'Voyage spatial à la recherche d’une nouvelle planète.'
-    },
-    {
-      title: 'Titanic',
-      theme: 'Drame',
-      image: 'https://image.tmdb.org/t/p/w500/9xjZS2rlVxm8SFx8kPC3aIGCOYQ.jpg',
-      description: 'Une histoire d’amour sur fond de catastrophe maritime.'
-    }
-  ];
+  constructor(private filmService: FilmService) {}
 
-  filteredFilms() {
-    if (this.selectedCategory === 'Tous') {
-      return this.films;
-    }
-    return this.films.filter(film => film.theme === this.selectedCategory);
+  ngOnInit() {
+    this.loadPopular();
+    this.loadFavorites();
+  }
+
+  // =====================
+  // POPULAR
+  // =====================
+  loadPopular() {
+    this.filmService.getPopular().subscribe((res: any) => {
+      this.films = res;
+    });
+  }
+
+  // =====================
+  // TOP RATED
+  // =====================
+  loadTopRated() {
+    this.filmService.getTopRated().subscribe((res: any) => {
+      this.films = res;
+    });
+  }
+
+  // =====================
+  // UPCOMING
+  // =====================
+  loadUpcoming() {
+    this.filmService.getUpcoming().subscribe((res: any) => {
+      this.films = res;
+    });
+  }
+
+  // =====================
+  // SEARCH
+  // =====================
+  search() {
+    if (!this.searchQuery) return;
+
+    this.filmService.search(this.searchQuery)
+      .subscribe((res: any) => {
+        this.films = res;
+      });
+  }
+  
+  loadFavorites() {
+    this.filmService.getFavorites()
+      .subscribe((res: any) => {
+        this.favorites = res;
+      });
+  }
+  addFavorite(film: any) {
+    this.filmService.addFavorite({
+      tmdb_id: film.id,
+      title: film.title,
+      poster_path: film.poster_path
+    }).subscribe(() => {
+      this.loadFavorites(); // IMPORTANT
+    });
   }
 }

@@ -29,70 +29,66 @@ const updateProfile = async (req, res) => {
 
 const getProfile = async (req, res) => {
   try {
+    const userId = req.user.id;
 
-    const user = await User.findById(req.user.id);
+    const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({
-        message: "Utilisateur introuvable"
-      });
+      return res.status(404).json({ message: "Utilisateur introuvable" });
     }
 
     res.json(user);
 
   } catch (err) {
-
-    res.status(500).json({
-      message: err.message
-    });
-
+    res.status(500).json({ message: err.message });
   }
 };
-
-const updatePassword = async (req, res) => {
-
+const getMyProfile = async (req, res) => {
   try {
+    const userId = req.user.id;
 
-    const password_hash = await bcrypt.hash(
-
-      req.body.password,
-
-      10
-
+    const user = await pool.query(
+      `SELECT id, name, email, photo_url, role, is_verified
+       FROM users
+       WHERE id=$1`,
+      [userId]
     );
 
-    const user = await User.updateProfile(
-
-      req.user.id,
-
-      {
-
-        password_hash
-
-      }
-
+    const favorites = await pool.query(
+      `SELECT * FROM favorite_movies WHERE user_id=$1`,
+      [userId]
     );
 
     res.json({
-
-      message: "Mot de passe modifié",
-
-      user
-
+      user: user.rows[0],
+      favorites: favorites.rows
     });
 
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
+};
+const updatePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { password } = req.body;
 
-  catch(err){
+    if (!password || password.length < 6) {
+      return res.status(400).json({ message: "Mot de passe trop court" });
+    }
 
-    res.status(500).json({
+    const hash = await bcrypt.hash(password, 10);
 
-      message: err.message
+    await pool.query(
+      `UPDATE users SET password_hash=$1 WHERE id=$2`,
+      [hash, userId]
+    );
 
-    });
+    res.json({ message: "Mot de passe mis à jour" });
 
+  } catch (err) {
+    res.status(500).json({ message: err.message });
   }
-
 };
 
 // Ajouter/modifier thèmes préférés
@@ -137,4 +133,4 @@ const listUsers = async (req, res) => {
   }
 };
 
-module.exports = { updateProfile, updateThemes, listUsers, getProfile, updatePassword, listUsers };
+module.exports = { updateProfile, updateThemes, listUsers, getProfile, getMyProfile, updatePassword, listUsers };

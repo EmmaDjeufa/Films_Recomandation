@@ -10,21 +10,24 @@ const app = express();
 // =====================
 const corsOptions = {
   origin: function (origin, callback) {
+
     const allowed = [
-      'https://upgraded-happiness-grrq944qqg5fw569-4200.app.github.dev',
-      'http://localhost:4200'
+      'http://localhost:4200',
+      'https://upgraded-happiness-grrq944qqg5fw569-4200.app.github.dev'
     ];
 
-    // DEV FIX IMPORTANT
+    // autorise postman / curl
     if (!origin) return callback(null, true);
 
     if (allowed.includes(origin)) {
       return callback(null, true);
     }
 
-    console.log("Blocked origin:", origin);
-    return callback(null, true); // 👈 IMPORTANT EN DEV (NE PAS BLOQUER)
+    console.log("❌ Blocked origin:", origin);
+
+    return callback(new Error("CORS not allowed"), false);
   },
+
   credentials: true,
   methods: ['GET','POST','PUT','DELETE','OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']

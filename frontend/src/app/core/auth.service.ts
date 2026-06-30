@@ -1,78 +1,35 @@
 //auth.service.ts
+import { jwtDecode } from 'jwt-decode';
 import { Injectable } from '@angular/core';
-
-import { HttpClient } from '@angular/common/http';
-
 import { BehaviorSubject } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
-
+@Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private apiUrl = '/api/auth';
+  currentUser = new BehaviorSubject<any>(null);
 
-  public currentUser = new BehaviorSubject<any>(null);
+  login(token: string) {
+    localStorage.setItem('token', token);
 
-  constructor(private http: HttpClient) {}
-
-  register(data:any){
-
-    return this.http.post(
-      `${this.apiUrl}/register`,
-      data
-    );
-
+    const decoded = jwtDecode(token);
+    this.currentUser.next(decoded);
   }
 
-  login(data:any){
-
-    return this.http.post(
-      `${this.apiUrl}/login`,
-      data
-    );
-
+  getToken() {
+    return localStorage.getItem('token');
   }
 
-  verifyCode(email:string,code:string){
+  loadUserFromStorage() {
+    const token = localStorage.getItem('token');
 
-    return this.http.post(
-
-      `${this.apiUrl}/verify-code`,
-
-      {
-
-        email,
-
-        code
-
-      }
-
-    );
-
+    if (token) {
+      const decoded = jwtDecode(token);
+      this.currentUser.next(decoded);
+    }
   }
 
-  setUser(user:any){
-
-    this.currentUser.next(user);
-
-    localStorage.setItem("token",user.token);
-
-  }
-
-  logout(){
-
+  logout() {
+    localStorage.removeItem('token');
     this.currentUser.next(null);
-
-    localStorage.removeItem("token");
-
   }
-
-  getToken(){
-
-    return localStorage.getItem("token");
-
-  }
-
 }
