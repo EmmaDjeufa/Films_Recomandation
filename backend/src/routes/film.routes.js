@@ -1,14 +1,9 @@
-//film.routes.js
-// film.routes.js
-
 const express = require('express');
 const router = express.Router();
 
 const authMiddleware = require('../middlewares/auth.middleware');
-const adminMiddleware = require('../middlewares/admin.middleware');
 
 const {
-  addFilm,
   getPopularFilms,
   getTopRatedFilms,
   getUpcomingFilms,
@@ -22,6 +17,9 @@ const {
   removeFavorite
 } = require('../controllers/film.controller');
 
+/* =====================
+   PUBLIC ROUTES
+===================== */
 router.get('/popular', getPopularFilms);
 router.get('/top-rated', getTopRatedFilms);
 router.get('/upcoming', getUpcomingFilms);
@@ -30,16 +28,30 @@ router.get('/search/actor', searchActor);
 router.get('/genre/:genre', getMoviesByGenre);
 router.get('/:id', getMovieDetails);
 
-// Protection uniquement après
+/* =====================
+   PROTECTED ROUTES
+===================== */
 router.use(authMiddleware);
 
-router.get('/recommendations', recommendFilms);
+// sécurité forte
+router.get('/recommendations', (req, res, next) => {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+  next();
+}, recommendFilms);
 
-router.get('/favorites', getFavorites);
+router.get('/favorites', (req, res, next) => {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+  next();
+}, getFavorites);
 
-router.post('/favorites', addFavorite);
+router.post('/favorites', (req, res, next) => {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+  next();
+}, addFavorite);
 
-router.delete('/favorites/:id', removeFavorite);
-
+router.delete('/favorites/:id', (req, res, next) => {
+  if (!req.user) return res.status(401).json({ message: 'Unauthorized' });
+  next();
+}, removeFavorite);
 
 module.exports = router;

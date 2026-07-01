@@ -123,3 +123,47 @@
 .profile-container button:hover {
   background: #1d4ed8;
 }
+.profile-container {
+  max-width: 900px;
+  margin: auto;
+  padding: 20px;
+}
+
+.profile-header {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.favorites-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+}
+
+.favorite-card {
+  background: white;
+  border-radius: 12px;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.favorite-card img {
+  width: 100%;
+  border-radius: 10px;
+}
+
+.empty {
+  text-align: center;
+  color: gray;
+  padding: 20px;
+}

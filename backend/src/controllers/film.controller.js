@@ -6,6 +6,13 @@ const pool = require('../config/db');
 // TMDB FILMS
 // =====================
 
+const safeUserId = (req) => {
+  if (!req.user || !req.user.id) {
+    throw new Error("User not authenticated");
+  }
+  return req.user.id;
+};
+
 const getPopularFilms = async (req, res) => {
   try {
     const response = await tmdb.get("/movie/popular");
@@ -75,44 +82,55 @@ const searchActor = async (req, res) => {
 
 const addFavorite = async (req, res) => {
   try {
-    const userId = req.user.id;
+    const userId = safeUserId(req);
+
     const { tmdb_id, title, poster_path } = req.body;
 
     await pool.query(
       `INSERT INTO favorite_movies(user_id, tmdb_id, title, poster_path)
-       VALUES ($1,$2,$3,$4)`,
+       VALUES ($1,$2,$3,$4)
+       ON CONFLICT DO NOTHING`,
       [userId, tmdb_id, title, poster_path]
     );
 
     res.json({ message: "Favori ajouté" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("addFavorite error:", err.message);
+    res.status(401).json({ message: "Unauthorized" });
   }
 };
 
 const getFavorites = async (req, res) => {
   try {
+    const userId = safeUserId(req);
+
     const result = await pool.query(
       `SELECT * FROM favorite_movies WHERE user_id=$1 ORDER BY created_at DESC`,
-      [req.user.id]
+      [userId]
     );
 
     res.json(result.rows);
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("getFavorites error:", err.message);
+    res.status(401).json({ message: "Unauthorized or session expired" });
   }
 };
 
 const removeFavorite = async (req, res) => {
   try {
+    const userId = req.user.id;
+    const tmdbId = req.params.id;
+
     await pool.query(
-      `DELETE FROM favorite_movies WHERE user_id=$1 AND tmdb_id=$2`,
-      [req.user.id, req.params.id]
+      `DELETE FROM favorite_movies 
+       WHERE user_id=$1 AND tmdb_id=$2`,
+      [userId, tmdbId]
     );
 
     res.json({ message: "Supprimé" });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error(err);
+    res.status(500).json({ message: "Erreur suppression favorite" });
   }
 };
 

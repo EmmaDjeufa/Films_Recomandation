@@ -12,68 +12,63 @@ import { FilmService } from '../../core/film.service';
 export class FilmRecommendationsComponent implements OnInit {
 
   films: any[] = [];
-  searchQuery = '';
   favorites: any[] = [];
+
+  loading = false;
+  activeCategory: string | null = null;
 
   constructor(private filmService: FilmService) {}
 
   ngOnInit() {
+    this.films = []; // état initial visible
+
     this.loadPopular();
     this.loadFavorites();
   }
 
-  // =====================
-  // POPULAR
-  // =====================
+  private fetchFilms(request$: any, category: string) {
+    this.loading = true;
+    this.activeCategory = category;
+
+    request$.subscribe({
+      next: (res: any) => {
+        this.films = Array.isArray(res) ? res : [];
+        this.loading = false;
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.films = [];
+        this.loading = false;
+      }
+    });
+  }
+
   loadPopular() {
-    this.filmService.getPopular().subscribe((res: any) => {
-      this.films = res;
-    });
+    this.fetchFilms(this.filmService.getPopular(), 'popular');
   }
 
-  // =====================
-  // TOP RATED
-  // =====================
   loadTopRated() {
-    this.filmService.getTopRated().subscribe((res: any) => {
-      this.films = res;
-    });
+    this.fetchFilms(this.filmService.getTopRated(), 'top');
   }
 
-  // =====================
-  // UPCOMING
-  // =====================
   loadUpcoming() {
-    this.filmService.getUpcoming().subscribe((res: any) => {
-      this.films = res;
+    this.fetchFilms(this.filmService.getUpcoming(), 'upcoming');
+  }
+
+  loadFavorites() {
+    this.filmService.getFavorites().subscribe({
+      next: (res: any) => this.favorites = res || [],
+      error: () => this.favorites = []
     });
   }
 
-  // =====================
-  // SEARCH
-  // =====================
-  search() {
-    if (!this.searchQuery) return;
-
-    this.filmService.search(this.searchQuery)
-      .subscribe((res: any) => {
-        this.films = res;
-      });
-  }
-  
-  loadFavorites() {
-    this.filmService.getFavorites()
-      .subscribe((res: any) => {
-        this.favorites = res;
-      });
-  }
   addFavorite(film: any) {
     this.filmService.addFavorite({
       tmdb_id: film.id,
       title: film.title,
       poster_path: film.poster_path
     }).subscribe(() => {
-      this.loadFavorites(); // IMPORTANT
+      this.loadFavorites();
     });
   }
 }

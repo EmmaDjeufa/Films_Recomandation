@@ -8,15 +8,14 @@ const app = express();
 // =====================
 // CORS CONFIG
 // =====================
+const allowed = [
+  'http://localhost:4200',
+  'https://localhost:4200',
+  'https://upgraded-happiness-grrq944qqg5fw569-4200.app.github.dev'
+];
+
 const corsOptions = {
   origin: function (origin, callback) {
-
-    const allowed = [
-      'http://localhost:4200',
-      'https://upgraded-happiness-grrq944qqg5fw569-4200.app.github.dev'
-    ];
-
-    // autorise postman / curl
     if (!origin) return callback(null, true);
 
     if (allowed.includes(origin)) {
@@ -24,8 +23,7 @@ const corsOptions = {
     }
 
     console.log("❌ Blocked origin:", origin);
-
-    return callback(null, true);
+    return callback(new Error("Not allowed by CORS"));
   },
 
   credentials: true,
@@ -44,12 +42,15 @@ app.use(express.json());
 
 // 4️⃣ LOGGING AFTER
 app.use((req, res, next) => {
-  console.log('REQ =>', req.method, req.url);
-  next();
-});
-
-app.use((req, res, next) => {
-  console.log("ORIGIN:", req.headers.origin);
+  console.log(
+    'REQ =>',
+    req.method,
+    req.url,
+    'AUTH:',
+    req.headers.authorization || 'NONE',
+    'ORIGIN:',
+    req.headers.origin || 'NONE'
+  );
   next();
 });
 
