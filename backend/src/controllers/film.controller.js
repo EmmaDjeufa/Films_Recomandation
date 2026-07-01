@@ -47,6 +47,28 @@ const searchMovies = async (req, res) => {
   }
 };
 
+const searchActor = async (req, res) => {
+    try {
+
+        const { query } = req.query;
+
+        const response = await tmdb.get("/search/person", {
+            params: {
+                query
+            }
+        });
+
+        res.json(response.data.results);
+
+    } catch (err) {
+
+        res.status(500).json({
+            message: err.message
+        });
+
+    }
+};
+
 // =====================
 // FAVORITES
 // =====================
@@ -94,6 +116,56 @@ const removeFavorite = async (req, res) => {
   }
 };
 
+const getMoviesByGenre = async (req, res) => {
+
+    try {
+
+        const response = await tmdb.get("/discover/movie", {
+            params: {
+                with_genres: req.params.genre
+            }
+        });
+
+        res.json(response.data.results);
+
+    } catch (err) {
+
+        res.status(500).json({
+            message: err.message
+        });
+
+    }
+
+};
+
+
+const getMovieDetails = async (req, res) => {
+
+    try {
+
+        const response = await tmdb.get(
+            `/movie/${req.params.id}`
+        );
+
+        res.json(response.data);
+
+    } catch (err) {
+
+        res.status(500).json({
+            message: err.message
+        });
+
+    }
+
+};
+
+const addFilm = async (req, res) => {
+
+    res.status(501).json({
+        message: "Ajout manuel désactivé (TMDb utilisé)."
+    });
+
+};
 // =====================
 // RECOMMENDATION
 // =====================
@@ -127,12 +199,16 @@ const recommendFilms = async (req, res) => {
 };
 
 module.exports = {
-  getPopularFilms,
-  getTopRatedFilms,
-  getUpcomingFilms,
-  searchMovies,
-  addFavorite,
-  getFavorites,
-  removeFavorite,
-  recommendFilms
+    addFilm,
+    getPopularFilms,
+    getTopRatedFilms,
+    getUpcomingFilms,
+    searchMovies,
+    searchActor,
+    getMoviesByGenre,
+    getMovieDetails,
+    recommendFilms,
+    addFavorite,
+    getFavorites,
+    removeFavorite
 };

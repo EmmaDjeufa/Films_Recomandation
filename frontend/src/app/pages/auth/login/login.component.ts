@@ -29,19 +29,13 @@ export class LoginComponent {
 
     }).subscribe({
 
-        next:(res:any)=>{
-
-            this.auth.setUser(res);
+        next: () => {
 
             this.router.navigate(["/profile"]);
 
-        },
-
-        error:(err)=>{
-
-            this.error=err.error.message;
-
         }
+
+        
 
     });
 

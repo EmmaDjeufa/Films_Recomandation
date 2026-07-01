@@ -19,27 +19,27 @@ export class FilmService {
   }
 
   getPopular() {
-    return this.http.get(`${this.apiUrl}/popular`, this.headers());
+    return this.http.get(`${this.apiUrl}/popular`);
   }
 
   getTopRated() {
-    return this.http.get(`${this.apiUrl}/top-rated`, this.headers());
+    return this.http.get(`${this.apiUrl}/top-rated`);
   }
 
   getUpcoming() {
-    return this.http.get(`${this.apiUrl}/upcoming`, this.headers());
+    return this.http.get(`${this.apiUrl}/upcoming`);
   }
 
   search(query: string) {
-    return this.http.get(`${this.apiUrl}/search?query=${query}`, this.headers());
+    return this.http.get(`${this.apiUrl}/search?query=${query}`);
   }
 
   searchActor(query: string) {
-    return this.http.get(`${this.apiUrl}/search/actor?query=${query}`, this.headers());
+    return this.http.get(`${this.apiUrl}/search/actor?query=${query}`);
   }
 
   getByGenre(id: number) {
-    return this.http.get(`${this.apiUrl}/genre/${id}`, this.headers());
+    return this.http.get(`${this.apiUrl}/genre/${id}`);
   }
 
   getDetails(id: number) {

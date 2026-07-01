@@ -133,4 +133,4 @@ const listUsers = async (req, res) => {
   }
 };
 
-module.exports = { updateProfile, updateThemes, listUsers, getProfile, getMyProfile, updatePassword, listUsers };
+module.exports = { updateProfile, updateThemes, listUsers, getProfile, getMyProfile, updatePassword};

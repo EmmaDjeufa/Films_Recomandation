@@ -22,46 +22,24 @@ const {
   removeFavorite
 } = require('../controllers/film.controller');
 
-router.use(authMiddleware);
-
-// =======================
-// Films TMDb
-// =======================
-
 router.get('/popular', getPopularFilms);
-
 router.get('/top-rated', getTopRatedFilms);
-
 router.get('/upcoming', getUpcomingFilms);
-
 router.get('/search', searchMovies);
-
 router.get('/search/actor', searchActor);
-
 router.get('/genre/:genre', getMoviesByGenre);
-
 router.get('/:id', getMovieDetails);
 
-// =======================
-// Recommandations
-// =======================
+// Protection uniquement après
+router.use(authMiddleware);
 
 router.get('/recommendations', recommendFilms);
-
-// =======================
-// Favoris
-// =======================
 
 router.get('/favorites', getFavorites);
 
 router.post('/favorites', addFavorite);
 
 router.delete('/favorites/:id', removeFavorite);
-
-// =======================
-// Administration
-// =======================
-
 
 
 module.exports = router;

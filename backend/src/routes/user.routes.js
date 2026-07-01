@@ -18,7 +18,7 @@ const {
 router.use(authMiddleware);
 
 // Profil
-router.get('/profile', getMyProfile);
+router.get('/me', getMyProfile);
 
 // Update profil (photo + name)
 router.put('/profile', upload.single('photo'), updateProfile);

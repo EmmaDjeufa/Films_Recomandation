@@ -25,7 +25,7 @@ const corsOptions = {
 
     console.log("❌ Blocked origin:", origin);
 
-    return callback(new Error("CORS not allowed"), false);
+    return callback(null, true);
   },
 
   credentials: true,
