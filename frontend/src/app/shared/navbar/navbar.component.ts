@@ -20,12 +20,6 @@ export class NavbarComponent {
     private router: Router
   ) {}
 
-  logout() {
-    this.auth.logout();
-    this.router.navigate(['/login']);
-    this.menuOpen = false;
-  }
-
   toggleMenu() {
     this.menuOpen = !this.menuOpen;
   }
@@ -34,8 +28,12 @@ export class NavbarComponent {
     this.menuOpen = false;
   }
 
+  logout() {
+    this.auth.logout();
+    this.router.navigate(['/login']);
+  }
+
   isConnected(): boolean {
     return !!this.auth.currentUser.value;
   }
-
 }

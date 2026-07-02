@@ -10,6 +10,7 @@ import { jwtDecode } from 'jwt-decode';
 export class AuthService {
 
   private apiUrl = "/api/auth";
+  
 
   currentUser = new BehaviorSubject<any>(null);
 
@@ -72,8 +73,9 @@ export class AuthService {
       this.currentUser.next(decoded);
 
     }
-
+    
   }
+  
 
   logout() {
 

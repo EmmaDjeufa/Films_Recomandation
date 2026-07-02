@@ -33,12 +33,12 @@ export class FilmRecommendationsComponent implements OnInit {
     request$.subscribe({
       next: (res: any) => {
         this.films = Array.isArray(res) ? res : [];
-        this.loading = false;
+        this.loading = true;
       },
       error: (err: any) => {
         console.error(err);
         this.films = [];
-        this.loading = false;
+        this.loading = true;
       }
     });
   }

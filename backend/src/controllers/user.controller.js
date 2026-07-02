@@ -123,19 +123,14 @@ const listUsers = async (req, res) => {
         u.name,
         u.email,
         u.photo_url,
-        u.is_verified,
-        COUNT(ut2.theme_id) AS common_themes
+        u.is_verified
       FROM users u
-      LEFT JOIN user_themes ut2
-        ON ut2.user_id = u.id
       WHERE u.id <> $1
-      GROUP BY u.id
-      ORDER BY common_themes DESC, u.name ASC
+      ORDER BY u.name ASC
     `, [userId]);
 
     const userIds = users.rows.map(u => u.id);
 
-    // récupérer les themes de tous les users en 1 seule requête
     const themesResult = await pool.query(`
       SELECT ut.user_id, t.name
       FROM user_themes ut
@@ -143,8 +138,8 @@ const listUsers = async (req, res) => {
       WHERE ut.user_id = ANY($1)
     `, [userIds]);
 
-    // mapping user_id -> themes
     const themesMap = {};
+
     themesResult.rows.forEach(row => {
       if (!themesMap[row.user_id]) themesMap[row.user_id] = [];
       themesMap[row.user_id].push(row.name);
@@ -152,7 +147,8 @@ const listUsers = async (req, res) => {
 
     const enriched = users.rows.map(u => ({
       ...u,
-      themes: themesMap[u.id] || []
+      themes: themesMap[u.id] || [],
+      common_themes: (themesMap[u.id] || []).length
     }));
 
     res.json(enriched);

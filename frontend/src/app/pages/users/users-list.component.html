@@ -28,7 +28,7 @@
 
         <p>📧 {{user.email}}</p>
 
-        <div *ngIf="user.themes && user.themes.length > 0">>
+        <div *ngIf="user.themes && user.themes.length > 0">
           <span *ngFor="let theme of user.themes">
             🎬 {{theme}}
           </span>
