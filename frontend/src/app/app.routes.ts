@@ -11,15 +11,21 @@ import { AdminGuard } from './core/admin.guard';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent},
+  { path: 'register', component: RegisterComponent },
   { path: 'verify', component: VerifyComponent },
-  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard]},
+  { path: 'profile', component: ProfileComponent, canActivate: [AuthGuard] },
   { path: 'users', component: UsersListComponent, canActivate: [AuthGuard] },
+
+  {
+    path: 'users/:id',
+    loadComponent: () =>
+      import('./pages/users/users-list.component')
+        .then(m => m.UsersListComponent)
+  },
+
   { path: 'films', component: FilmRecommendationsComponent },
   { path: 'admin', component: AdminDashboardComponent, canActivate: [AdminGuard] },
 
   { path: '', redirectTo: '/login', pathMatch: 'full' },
-
-  // Facultatif mais recommandé
   { path: '**', redirectTo: '/login' }
 ];

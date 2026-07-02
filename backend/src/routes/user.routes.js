@@ -12,7 +12,8 @@ const {
   listUsers,
   getProfile,
   getMyProfile,
-  updatePassword
+  updatePassword,
+  getUserById
 } = require('../controllers/user.controller');
 
 router.use(authMiddleware);
@@ -31,5 +32,6 @@ router.put('/themes', updateThemes);
 
 // Users list
 router.get('/all', listUsers);
+router.get('/:id', getUserById);
 
 module.exports = router;

@@ -28,7 +28,7 @@ export class UserService {
 
   // ✅ Ajouté
   getProfile() {
-    return this.http.get('/api/users/profile', this.getHeaders());
+    return this.http.get(`${this.apiUrl}/me`, this.getHeaders());
   }
 
   updatePassword(newPassword: string) {

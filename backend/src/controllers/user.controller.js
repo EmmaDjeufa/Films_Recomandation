@@ -116,21 +116,93 @@ const updateThemes = async (req, res) => {
 const listUsers = async (req, res) => {
   try {
     const userId = req.user.id;
+
     const users = await pool.query(`
-      SELECT u.id, u.name, u.photo_url, array_agg(t.name) AS themes,
-      COUNT(t.id) AS common_themes
+      SELECT
+        u.id,
+        u.name,
+        u.email,
+        u.photo_url,
+        u.is_verified,
+        COUNT(ut2.theme_id) AS common_themes
       FROM users u
-      LEFT JOIN user_themes ut ON u.id = ut.user_id
-      LEFT JOIN themes t ON ut.theme_id = t.id
-      WHERE u.id != $1
+      LEFT JOIN user_themes ut2
+        ON ut2.user_id = u.id
+      WHERE u.id <> $1
       GROUP BY u.id
-      ORDER BY common_themes DESC
+      ORDER BY common_themes DESC, u.name ASC
     `, [userId]);
 
-    res.json(users.rows);
+    const userIds = users.rows.map(u => u.id);
+
+    // récupérer les themes de tous les users en 1 seule requête
+    const themesResult = await pool.query(`
+      SELECT ut.user_id, t.name
+      FROM user_themes ut
+      JOIN themes t ON t.id = ut.theme_id
+      WHERE ut.user_id = ANY($1)
+    `, [userIds]);
+
+    // mapping user_id -> themes
+    const themesMap = {};
+    themesResult.rows.forEach(row => {
+      if (!themesMap[row.user_id]) themesMap[row.user_id] = [];
+      themesMap[row.user_id].push(row.name);
+    });
+
+    const enriched = users.rows.map(u => ({
+      ...u,
+      themes: themesMap[u.id] || []
+    }));
+
+    res.json(enriched);
+
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: err.message });
   }
 };
+const getUserById = async (req, res) => {
 
-module.exports = { updateProfile, updateThemes, listUsers, getProfile, getMyProfile, updatePassword};
+  try {
+
+    const result = await pool.query(`
+      SELECT
+        id,
+        name,
+        email,
+        photo_url,
+        role,
+        is_verified
+      FROM users
+      WHERE id = $1
+    `, [req.params.id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ message: 'Utilisateur introuvable' });
+    }
+
+    const themes = await pool.query(`
+      SELECT t.name
+      FROM user_themes ut
+      JOIN themes t
+        ON ut.theme_id = t.id
+      WHERE ut.user_id = $1
+    `, [req.params.id]);
+
+    res.json({
+      ...result.rows[0],
+      themes: themes.rows.map(t => t.name)
+    });
+
+  } catch (err) {
+
+    console.error(err);
+    res.status(500).json({ message: err.message });
+
+  }
+
+};
+
+
+module.exports = { updateProfile, updateThemes, listUsers, getProfile, getMyProfile, updatePassword, getUserById};

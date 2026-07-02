@@ -1,3 +1,4 @@
+//user-card.component.ts
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ThemeBadgeComponent } from '../theme-badge/theme-badge.component';
@@ -12,3 +13,4 @@ import { ThemeBadgeComponent } from '../theme-badge/theme-badge.component';
 export class UserCardComponent {
   @Input() user: any;
 }
+

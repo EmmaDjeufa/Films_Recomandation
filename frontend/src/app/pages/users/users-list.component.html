@@ -1,14 +1,56 @@
+<!-- users-list.component.html  -->
 <div class="users-container">
-  <h2>Liste des utilisateurs</h2>
 
-  <div *ngIf="users.length > 0; else noUsers">
-    <div *ngFor="let user of users" class="user-card">
-      <p>Nom : {{user.name}}</p>
-      <p>Email : {{user.email}}</p>
-    </div>
+  <h2>Découvrir des utilisateurs</h2>
+
+  <!-- LOADING -->
+  <div *ngIf="loading">
+    Chargement...
   </div>
 
-  <ng-template #noUsers>
-    <p class="no-users">Aucun utilisateur pour le moment.</p>
-  </ng-template>
+  <!-- USERS -->
+  <div *ngIf="!loading && users.length > 0">
+
+    <div class="user-card" *ngFor="let user of users">
+
+      <img class="avatar"
+           [src]="user.photo_url || 'assets/default.png'">
+
+      <div class="content">
+
+        <div class="header">
+          <h3>{{user.name}}</h3>
+
+          <span *ngIf="user.is_verified">
+            ✔ Vérifié
+          </span>
+        </div>
+
+        <p>📧 {{user.email}}</p>
+
+        <div *ngIf="user.themes && user.themes.length > 0">>
+          <span *ngFor="let theme of user.themes">
+            🎬 {{theme}}
+          </span>
+        </div>
+
+        <div>
+          ⭐ {{user.common_themes}} thème(s) en commun
+        </div>
+
+        <button [routerLink]="['/users', user.id]">
+          Voir le profil
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- EMPTY STATE -->
+  <div *ngIf="!loading && users.length === 0">
+    Aucun utilisateur trouvé.
+  </div>
+
 </div>
