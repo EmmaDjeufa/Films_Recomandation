@@ -117,21 +117,35 @@ const getFavorites = async (req, res) => {
 };
 
 const removeFavorite = async (req, res) => {
+
   try {
+
     const userId = req.user.id;
     const tmdbId = req.params.id;
 
-    await pool.query(
-      `DELETE FROM favorite_movies 
-       WHERE user_id=$1 AND tmdb_id=$2`,
+    console.log("Suppression :", userId, tmdbId);
+
+    const result = await pool.query(
+      `DELETE FROM favorite_movies
+       WHERE user_id=$1
+       AND tmdb_id=$2`,
       [userId, tmdbId]
     );
 
+    console.log(result);
+
     res.json({ message: "Supprimé" });
+
   } catch (err) {
+
     console.error(err);
-    res.status(500).json({ message: "Erreur suppression favorite" });
+
+    res.status(500).json({
+      message: "Erreur suppression favorite"
+    });
+
   }
+
 };
 
 const getMoviesByGenre = async (req, res) => {

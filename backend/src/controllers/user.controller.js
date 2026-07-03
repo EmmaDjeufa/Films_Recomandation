@@ -6,27 +6,52 @@ const { uploadProfilePhoto } = require('../utils/supabase');
 
 // Modifier le profil
 const updateProfile = async (req, res) => {
+  console.log("🔥 FILE RECEIVED:", req.file);
+  console.log("🔥 BODY:", req.body);
   try {
     const userId = req.user.id;
     const { name, password } = req.body;
 
-    let password_hash;
-    if (password) password_hash = await bcrypt.hash(password, 10);
-    else password_hash = undefined;
+    console.log("🔥 FILE:", req.file);
+    console.log("🔥 BODY:", req.body);
 
-    let photo_url;
-    if (req.file) {
-      // Upload sur Supabase
-      photo_url = await uploadProfilePhoto(req.file.buffer, `${userId}-${Date.now()}`, req.file.mimetype);
+    let password_hash = null;
+
+    if (password?.length > 0) {
+      password_hash = await bcrypt.hash(password, 10);
     }
 
-    const updatedUser = await User.updateProfile(userId, { name, password_hash, photo_url });
-    res.json({ message: 'Profil mis à jour', user: updatedUser });
+    let photo_url = null;
+
+    if (req.file?.buffer) {
+      photo_url = await uploadProfilePhoto(
+        req.file.buffer,
+        `${userId}-${Date.now()}`,
+        req.file.mimetype
+      );
+    }
+
+    const updateData = {};
+
+    if (name) updateData.name = name;
+    if (password_hash) updateData.password_hash = password_hash;
+    if (photo_url) updateData.photo_url = photo_url;
+
+    const updatedUser = await User.updateProfile(userId, updateData);
+
+    return res.json({
+      message: "Profil mis à jour",
+      user: updatedUser
+    });
+
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    console.error("🔥 UPDATE PROFILE ERROR:", err);
+    return res.status(500).json({
+      message: err.message,
+      stack: err.stack
+    });
   }
 };
-
 const getProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -115,6 +140,7 @@ const updateThemes = async (req, res) => {
 // Lister autres utilisateurs avec thèmes partagés
 const listUsers = async (req, res) => {
   try {
+
     const userId = req.user.id;
 
     const users = await pool.query(`
@@ -125,17 +151,21 @@ const listUsers = async (req, res) => {
         u.photo_url,
         u.is_verified
       FROM users u
-      WHERE u.id <> $1
       ORDER BY u.name ASC
-    `, [userId]);
+    `);
 
+    // ✅ SI VIDE → éviter crash SQL
     const userIds = users.rows.map(u => u.id);
+
+    if (userIds.length === 0) {
+      return res.json([]);
+    }
 
     const themesResult = await pool.query(`
       SELECT ut.user_id, t.name
       FROM user_themes ut
       JOIN themes t ON t.id = ut.theme_id
-      WHERE ut.user_id = ANY($1)
+      WHERE ut.user_id = ANY($1::int[])
     `, [userIds]);
 
     const themesMap = {};
@@ -154,7 +184,7 @@ const listUsers = async (req, res) => {
     res.json(enriched);
 
   } catch (err) {
-    console.error(err);
+    console.error("LIST USERS ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 };
@@ -171,7 +201,7 @@ const getUserById = async (req, res) => {
         role,
         is_verified
       FROM users
-      WHERE id = $1
+      WHERE id = $1::int
     `, [req.params.id]);
 
     if (result.rows.length === 0) {

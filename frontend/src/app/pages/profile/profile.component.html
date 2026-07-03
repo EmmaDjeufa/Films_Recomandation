@@ -1,29 +1,89 @@
-<div class="profile-container">
+<div class="profile-page">
 
-  <img [src]="user?.photo_url || 'assets/default.png'">
+  <!-- HEADER -->
+  <div class="profile-card">
 
-  <h2>{{ user?.name }}</h2>
-  <p>{{ user?.email }}</p>
+    <div class="avatar-section">
 
-  <h3>⭐ Vos favoris</h3>
+      <img
+        class="avatar"
+        [src]="user?.photo_url ?? defaultAvatar">
 
-  <div class="favorites">
-    <div *ngFor="let f of favorites">
+      <!-- CUSTOM FILE UPLOAD -->
+      <label class="file-upload">
+        📸 Changer photo
+        <input type="file" (change)="onFileSelected($event)">
+      </label>
 
-      <img [src]="'https://image.tmdb.org/t/p/w200' + f.poster_path">
-
-      <p>{{ f.title }}</p>
-
-      <button (click)="removeFavorite(f.tmdb_id)">
-        supprimer
+      <button
+        *ngIf="selectedFile"
+        (click)="uploadPhoto()">
+        Enregistrer la photo
       </button>
 
     </div>
+
+    <div class="user-info">
+      <h2>{{ user?.name }}</h2>
+      <p>{{ user?.email }}</p>
+    </div>
+
   </div>
 
-  <h3>🔐 Mot de passe</h3>
+  <!-- FAVORITES -->
+  <div class="section">
+    <h3>🎬 Vos favoris</h3>
 
-  <input [(ngModel)]="newPassword" type="password">
-  <button (click)="updatePassword()">Modifier</button>
+    <div class="favorites-grid" *ngIf="favorites.length; else empty">
+
+      <div class="favorite-card" *ngFor="let f of favorites">
+
+        <img [src]="'https://image.tmdb.org/t/p/w300' + f.poster_path">
+
+        <div class="fav-title">{{ f.title }}</div>
+
+        <button (click)="removeFavorite(f.tmdb_id)">
+          Supprimer
+        </button>
+
+      </div>
+
+    </div>
+
+    <ng-template #empty>
+      <p class="empty">Aucun favori</p>
+    </ng-template>
+
+  </div>
+
+  <!-- PASSWORD SECTION -->
+  <div class="section">
+
+    <h3>🔐 Sécurité du compte</h3>
+
+    <p class="section-hint">
+      Modifiez votre mot de passe pour sécuriser votre compte
+    </p>
+
+    <div class="password-card">
+
+      <input
+        [(ngModel)]="newPassword"
+        type="password"
+        placeholder="Nouveau mot de passe">
+
+      <button
+        (click)="updatePassword()"
+        [disabled]="newPassword.length < 6">
+        Mettre à jour
+      </button>
+
+      <p class="success" *ngIf="passwordSuccess">
+        ✔ Mot de passe mis à jour
+      </p>
+
+    </div>
+
+  </div>
 
 </div>

@@ -20,6 +20,8 @@ export class FilmRecommendationsComponent implements OnInit {
   constructor(private filmService: FilmService) {}
 
   ngOnInit() {
+
+    console.log('[Films] ngOnInit appelé');
     this.films = []; // état initial visible
 
     this.loadPopular();
@@ -27,23 +29,55 @@ export class FilmRecommendationsComponent implements OnInit {
   }
 
   private fetchFilms(request$: any, category: string) {
+
+    console.log('==============================');
+    console.log('[Films] Début chargement');
+    console.log('Catégorie :', category);
+
     this.loading = true;
     this.activeCategory = category;
 
     request$.subscribe({
+
       next: (res: any) => {
+
+        console.log('[Films] Réponse API :', res);
+
         this.films = Array.isArray(res) ? res : [];
-        this.loading = true;
+
+        console.log('[Films] Nombre de films :', this.films.length);
+
+        if (this.films.length > 0) {
+          console.log('[Films] Premier film :', this.films[0]);
+        } else {
+          console.warn('[Films] Aucun film reçu');
+        }
+
+        this.loading = false;
+
+        console.log('[Films] Chargement terminé');
+        console.log('==============================');
+
       },
+
       error: (err: any) => {
-        console.error(err);
+
+        console.error('[Films] Erreur API :', err);
+
         this.films = [];
-        this.loading = true;
+        this.loading = false;
+
+        console.log('[Films] Chargement terminé avec erreur');
+        console.log('==============================');
+
       }
+
     });
+
   }
 
   loadPopular() {
+    console.log('[Films] Appel de loadPopular()');
     this.fetchFilms(this.filmService.getPopular(), 'popular');
   }
 
@@ -72,3 +106,5 @@ export class FilmRecommendationsComponent implements OnInit {
     });
   }
 }
+
+
