@@ -19,7 +19,15 @@ export class App implements OnInit {
   constructor(private auth: AuthService) {}
 
   ngOnInit() {
+
+    console.log('========================');
+
+    console.log('[APP] Initialisation');
+
     this.auth.loadUserFromStorage();
+
+    console.log('[APP] User :', this.auth.currentUser.value);
+
   }
 }
 

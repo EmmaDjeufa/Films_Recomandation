@@ -33,7 +33,9 @@ export class NavbarComponent {
     this.router.navigate(['/login']);
   }
 
-  isConnected(): boolean {
+  get connected(): boolean {
+
     return !!this.auth.currentUser.value;
+
   }
 }
