@@ -1,60 +1,133 @@
 <div class="profile-page">
 
-  <!-- HEADER -->
-  <div class="profile-card">
 
-    <div class="avatar-section">
+<div *ngIf="loading" class="loading">
 
-      <img
-        class="avatar"
-        [src]="user?.photo_url ?? defaultAvatar">
+    Chargement du profil...
 
-      <!-- CUSTOM FILE UPLOAD -->
-      <label class="file-upload">
-        📸 Changer photo
-        <input type="file" (change)="onFileSelected($event)">
-      </label>
+</div>
 
-      <button
-        *ngIf="selectedFile"
-        (click)="uploadPhoto()">
-        Enregistrer la photo
-      </button>
 
-    </div>
 
-    <div class="user-info">
-      <h2>{{ user?.name }}</h2>
-      <p>{{ user?.email }}</p>
-    </div>
+<div *ngIf="!loading && user">
 
-  </div>
 
-  <!-- FAVORITES -->
-  <div class="section">
-    <h3>🎬 Vos favoris</h3>
+<div class="profile-card">
 
-    <div class="favorites-grid" *ngIf="favorites.length; else empty">
 
-      <div class="favorite-card" *ngFor="let f of favorites">
+<div class="avatar-section">
 
-        <img [src]="'https://image.tmdb.org/t/p/w300' + f.poster_path">
 
-        <div class="fav-title">{{ f.title }}</div>
+<img
+class="avatar"
+[src]="avatarUrl">
 
-        <button (click)="removeFavorite(f.tmdb_id)">
-          Supprimer
-        </button>
 
-      </div>
+<label class="file-upload">
 
-    </div>
+📸 Changer photo
 
-    <ng-template #empty>
-      <p class="empty">Aucun favori</p>
-    </ng-template>
+<input
+type="file"
+(change)="onFileSelected($event)">
 
-  </div>
+</label>
+
+
+
+<button
+*ngIf="selectedFile"
+(click)="uploadPhoto()">
+
+Enregistrer la photo
+
+</button>
+
+
+</div>
+
+
+
+
+
+<div class="user-info">
+
+<h2>
+{{user.name}}
+</h2>
+
+
+<p>
+{{user.email}}
+</p>
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="section">
+
+
+<h3>
+🎬 Vos favoris
+</h3>
+
+
+
+<div
+class="favorites-grid"
+*ngIf="favorites.length>0; else empty">
+
+
+<div
+class="favorite-card"
+*ngFor="let f of favorites">
+
+
+<img
+[src]="'https://image.tmdb.org/t/p/w300'+f.poster_path">
+
+
+<div class="fav-title">
+
+{{f.title}}
+
+</div>
+
+
+<button
+(click)="removeFavorite(f.tmdb_id)">
+
+Supprimer
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+<ng-template #empty>
+
+<p class="empty">
+
+Aucun favori
+
+</p>
+
+</ng-template>
+
+
+</div>
 
   <!-- PASSWORD SECTION -->
   <div class="section">
