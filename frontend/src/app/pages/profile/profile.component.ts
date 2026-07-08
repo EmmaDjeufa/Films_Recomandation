@@ -13,15 +13,15 @@ import { FilmService } from '../../core/film.service';
 
 @Component({
   selector: 'app-profile',
-  standalone: true,
-
+  standalone:true,
   imports:[
     CommonModule,
     FormsModule
   ],
-
   templateUrl:'./profile.component.html',
-  styleUrls:['./profile.component.css']
+  styleUrls:[
+    './profile.component.css'
+  ]
 })
 
 
@@ -30,22 +30,29 @@ export class ProfileComponent implements OnInit {
 
   user:any = null;
 
-  favorites:any[] = [];
-
-  loading = true;
+  favorites:any[]=[];
 
 
-  newPassword = '';
-
-  passwordSuccess=false;
+  loading=true;
 
 
   selectedFile:File|null=null;
 
+
   previewUrl:string|null=null;
 
 
-  defaultAvatar='assets/default-avatar.png';
+  newPassword='';
+
+
+  passwordSuccess=false;
+
+
+  avatarError=false;
+
+
+  readonly defaultAvatar =
+    'images/default.png';
 
 
 
@@ -57,7 +64,7 @@ export class ProfileComponent implements OnInit {
 
 
 
-  ngOnInit():void{
+  ngOnInit(){
 
     this.loadProfile();
 
@@ -67,62 +74,57 @@ export class ProfileComponent implements OnInit {
 
 
 
-  loadProfile():void{
-
+  loadProfile(){
 
     console.clear();
 
-    console.log('========== PROFILE ==========');
+    console.log(
+      "========== PROFILE =========="
+    );
 
 
     this.loading=true;
 
 
 
-    this.userService.getProfile()
+    this.userService
+    .getProfile()
     .subscribe({
 
       next:(data:any)=>{
 
 
         console.log(
-          '[PROFILE DATA]',
+          "[PROFILE DATA]",
           data
         );
 
 
-
         this.user =
-          data?.user ?? null;
-
+          data.user ?? null;
 
 
         this.favorites =
-          data?.favorites ?? [];
+          data.favorites ?? [];
 
 
 
         console.log(
-          'USER:',
+          "USER:",
           this.user
         );
 
 
         console.log(
-          'FAVORITES:',
+          "FAVORITES:",
           this.favorites.length
         );
-
 
 
         this.loading=false;
 
 
 
-        /*
-          Force Angular à refaire
-          le rendu immédiatement
-        */
         this.cd.detectChanges();
 
 
@@ -134,7 +136,7 @@ export class ProfileComponent implements OnInit {
 
 
         console.error(
-          '[PROFILE ERROR]',
+          "[PROFILE ERROR]",
           err
         );
 
@@ -150,7 +152,35 @@ export class ProfileComponent implements OnInit {
 
     });
 
+  }
 
+
+
+
+
+
+
+  get avatarUrl(){
+
+
+    if(this.previewUrl){
+
+      return this.previewUrl;
+
+    }
+
+
+    if(
+      this.user?.photo_url &&
+      !this.avatarError
+    ){
+
+      return this.user.photo_url;
+
+    }
+
+
+    return this.defaultAvatar;
 
   }
 
@@ -159,58 +189,33 @@ export class ProfileComponent implements OnInit {
 
 
 
- get avatarUrl(): string {
 
-      if (this.previewUrl) {
-          return this.previewUrl;
-      }
-
-      if (this.user?.photo_url) {
-          return this.user.photo_url;
-      }
-
-      return this.defaultAvatar;
-
-  }
-
-
-
-
+  
 
   onFileSelected(event:any){
-
 
     const file =
       event.target.files?.[0];
 
+    if(!file){
+      return;
+    }
 
-    if(!file)return;
-
-
+    this.avatarError = false;
 
     this.selectedFile=file;
-
-
 
     const reader =
       new FileReader();
 
-
     reader.onload=()=>{
-
 
       this.previewUrl =
         reader.result as string;
 
-
-      this.cd.detectChanges();
-
     };
 
-
     reader.readAsDataURL(file);
-
-
 
   }
 
@@ -223,8 +228,11 @@ export class ProfileComponent implements OnInit {
   uploadPhoto(){
 
 
-    if(!this.selectedFile)
+    if(!this.selectedFile){
+
       return;
+
+    }
 
 
 
@@ -233,7 +241,7 @@ export class ProfileComponent implements OnInit {
 
 
     formData.append(
-      'photo',
+      "photo",
       this.selectedFile
     );
 
@@ -243,18 +251,21 @@ export class ProfileComponent implements OnInit {
     .updateProfile(formData)
     .subscribe({
 
-
-      next:()=>{
+      next:(response:any)=>{
 
 
         console.log(
-          '[PHOTO UPDATED]'
+          "[PHOTO UPDATED]",
+          response
         );
 
 
         this.selectedFile=null;
 
         this.previewUrl=null;
+
+
+        this.avatarError=false;
 
 
         this.loadProfile();
@@ -267,14 +278,14 @@ export class ProfileComponent implements OnInit {
 
 
         console.error(
+          "[UPLOAD ERROR]",
           err
         );
 
+
       }
 
-
     });
-
 
 
   }
@@ -285,33 +296,30 @@ export class ProfileComponent implements OnInit {
 
 
 
-
-  removeFavorite(id:number){
+  removeFavorite(tmdbId:number){
 
 
     this.filmService
-    .removeFavorite(id)
+    .removeFavorite(tmdbId)
     .subscribe({
-
 
       next:()=>{
 
 
         this.favorites =
-        this.favorites.filter(
-          f=>f.tmdb_id!==id
-        );
-
-
-        this.cd.detectChanges();
+          this.favorites.filter(
+            f=>f.tmdb_id!==tmdbId
+          );
 
 
       },
 
 
       error:err=>
-        console.error(err)
-
+        console.error(
+          "[REMOVE FAVORITE ERROR]",
+          err
+        )
 
     });
 
@@ -327,8 +335,11 @@ export class ProfileComponent implements OnInit {
   updatePassword(){
 
 
-    if(this.newPassword.length < 6)
+    if(this.newPassword.length < 6){
+
       return;
+
+    }
 
 
 
@@ -336,39 +347,37 @@ export class ProfileComponent implements OnInit {
     .updatePassword(this.newPassword)
     .subscribe({
 
-
       next:()=>{
 
 
         this.newPassword='';
 
+
         this.passwordSuccess=true;
+
 
 
         setTimeout(()=>{
 
-
           this.passwordSuccess=false;
 
-
-          this.cd.detectChanges();
-
-
         },3000);
-
 
 
       },
 
 
       error:err=>
-        console.error(err)
-
+        console.error(
+          "[PASSWORD ERROR]",
+          err
+        )
 
     });
 
 
   }
+
 
 
 }

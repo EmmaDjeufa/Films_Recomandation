@@ -10,6 +10,7 @@ const updateProfile = async (req, res) => {
   console.log("🔥 BODY:", req.body);
   try {
     const userId = req.user.id;
+    console.log("USER FROM TOKEN:", req.user);
     const { name, password } = req.body;
 
     console.log("🔥 FILE:", req.file);
@@ -23,19 +24,33 @@ const updateProfile = async (req, res) => {
 
     let photo_url = null;
 
-    if (req.file?.buffer) {
+    if (req.file) {
+
       photo_url = await uploadProfilePhoto(
         req.file.buffer,
-        `${userId}-${Date.now()}`,
-        req.file.mimetype
+        req.file.originalname,
+        req.file.mimetype,
+        req.user.id
       );
+
+
+
+      console.log(
+        "PHOTO URL GENERATED:",
+        photo_url
+      );
+
     }
 
     const updateData = {};
 
     if (name) updateData.name = name;
     if (password_hash) updateData.password_hash = password_hash;
-    if (photo_url) updateData.photo_url = photo_url;
+    if(photo_url !== null){
+
+      updateData.photo_url = photo_url;
+
+    }
 
     const updatedUser = await User.updateProfile(userId, updateData);
 

@@ -112,9 +112,9 @@ const User = {
   updateProfile: async (
     id,
     {
-      name,
-      photo_url,
-      password_hash
+      name = null,
+      photo_url = null,
+      password_hash = null
     }
   ) => {
 
@@ -123,11 +123,11 @@ const User = {
       UPDATE users
       SET
 
-      name = COALESCE($1,name),
+        name = COALESCE($1,name),
 
-      photo_url = COALESCE($2,photo_url),
+        photo_url = COALESCE($2,photo_url),
 
-      password_hash = COALESCE($3,password_hash)
+        password_hash = COALESCE($3,password_hash)
 
       WHERE id=$4
 
@@ -142,6 +142,7 @@ const User = {
     );
 
     return result.rows[0];
+
   },
 
   // ==========================

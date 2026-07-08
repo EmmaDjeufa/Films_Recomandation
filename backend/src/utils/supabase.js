@@ -3,21 +3,35 @@
 const { createClient } = require('@supabase/supabase-js');
 require('dotenv').config();
 
+
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_KEY
 );
 
+
+
 const uploadProfilePhoto = async (
   fileBuffer,
   fileName,
-  mimeType
+  mimeType,
+  userId
 ) => {
 
-  const { error } = await supabase.storage
+  const filePath = `${userId}-${Date.now()}.jpg`;
+
+
+  console.log("SUPABASE UPLOAD START");
+  console.log("Bucket :", process.env.SUPABASE_BUCKET);
+  console.log("Path :", filePath);
+
+
+
+  const { error } = await supabase
+    .storage
     .from(process.env.SUPABASE_BUCKET)
     .upload(
-      `profiles/${fileName}`,
+      filePath,
       fileBuffer,
       {
         contentType: mimeType,
@@ -25,16 +39,40 @@ const uploadProfilePhoto = async (
       }
     );
 
-  if (error) throw error;
 
-  const { data } = supabase.storage
+  if(error){
+
+    console.error(
+      "SUPABASE UPLOAD ERROR",
+      error
+    );
+
+    throw error;
+
+  }
+
+
+
+  const { data } = supabase
+    .storage
     .from(process.env.SUPABASE_BUCKET)
-    .getPublicUrl(`profiles/${fileName}`);
+    .getPublicUrl(filePath);
+
+
+
+  console.log(
+    "PUBLIC URL:",
+    data.publicUrl
+  );
+
 
   return data.publicUrl;
+
 };
 
-module.exports = {
+
+
+module.exports={
   supabase,
   uploadProfilePhoto
 };
