@@ -3,14 +3,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { tap } from 'rxjs/operators';
 import { AuthService } from './auth.service';
+import { environment } from '../../environments/environment';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class FilmService {
 
-  private apiUrl = '/api/films';
-
+  //private apiUrl = '/api/films';
+  private apiUrl = `${environment.apiUrl}/films`;
   constructor(
     private http: HttpClient,
     private auth: AuthService
