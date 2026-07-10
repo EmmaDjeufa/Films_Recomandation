@@ -3,6 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { NavbarComponent } from './shared/navbar/navbar.component';
 import { FormsModule } from '@angular/forms'; 
 import { AuthService } from './core/auth.service';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +29,15 @@ export class App implements OnInit {
 
     console.log('[APP] User :', this.auth.currentUser.value);
 
+
+    console.log('======================');
+    console.log('ENVIRONMENT');
+    console.log(environment);
+    console.log('API =', environment.apiUrl);
+    console.log('======================');
+
   }
 }
+
+
 

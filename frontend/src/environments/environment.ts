@@ -2,6 +2,6 @@ export const environment = {
 
     production: false,
 
-    apiUrl: 'http://localhost:5000/api'
+    apiUrl: 'https://upgraded-happiness-grrq944qqg5fw569-4200.app.github.dev/api'
 
 };
