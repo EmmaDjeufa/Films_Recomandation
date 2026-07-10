@@ -49,7 +49,10 @@ export class FilmService {
 
   getPopular() {
 
-    console.log('[FilmService] GET /popular');
+    console.log(
+      '[FilmService URL]',
+      `${this.apiUrl}/popular`
+    );
 
     return this.http
       .get(`${this.apiUrl}/popular`)
