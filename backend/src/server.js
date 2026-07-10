@@ -17,7 +17,7 @@ const allowed = [
   'http://localhost:4200',
   'https://localhost:4200',
   'https://upgraded-happiness-grrq944qqg5fw569-4200.app.github.dev',
-  'https://reckomovies.vercel.app'
+  'https://reckmofilms.vercel.app'
 ];
 
 const corsOptions = {
