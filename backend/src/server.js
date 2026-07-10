@@ -1,4 +1,9 @@
 //server.js
+
+
+//ng serve --port $PORT
+
+
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
