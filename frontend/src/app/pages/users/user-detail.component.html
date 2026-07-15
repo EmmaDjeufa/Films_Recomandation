@@ -1,0 +1,91 @@
+<div class="public-profile">
+  <button
+    class="back-button"
+    (click)="goBackUsers()">
+
+        ← Retour aux utilisateurs
+
+  </button>
+
+  <div
+  class="loading"
+  *ngIf="loading">
+
+    Chargement du profil...
+
+  </div>
+
+
+
+  <div
+  class="profile-card"
+  *ngIf="user && !loading">
+
+
+    <img
+
+    class="avatar"
+
+    [src]="user.photo_url || 'images/default.png'"
+
+    >
+
+
+
+    <div class="info">
+
+
+      <h2>
+        {{user.name}}
+      </h2>
+
+
+
+      <p>
+        📧 {{user.email}}
+      </p>
+
+
+
+
+      <h3>
+        🎬 Thèmes favoris
+      </h3>
+
+
+
+      <div
+      class="themes"
+      *ngIf="user.themes?.length">
+
+
+        <span
+        class="theme"
+        *ngFor="let t of user.themes">
+
+          {{t}}
+
+        </span>
+
+
+      </div>
+
+
+
+      <p
+      *ngIf="!user.themes?.length">
+
+        Aucun thème renseigné
+
+      </p>
+
+
+
+    </div>
+
+
+  </div>
+
+
+
+</div>

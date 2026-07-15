@@ -5,7 +5,7 @@ import {
   ChangeDetectorRef,
   OnDestroy
 } from '@angular/core';
-
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 
@@ -44,6 +44,7 @@ implements OnInit, OnDestroy {
 
 
   loading=true;
+  currentUserId:number|null = null;
 
 
   private destroy$=
@@ -56,7 +57,9 @@ implements OnInit, OnDestroy {
 
     private userService:UserService,
 
-    private cd:ChangeDetectorRef
+    private cd:ChangeDetectorRef,
+     
+    private router:Router
 
   ){}
 
@@ -66,15 +69,55 @@ implements OnInit, OnDestroy {
 
   ngOnInit():void{
 
-
+    this.loadCurrentUser();
     this.loadUsers();
 
 
   }
 
+openProfile(user:any){
+
+  if(user.id === this.currentUserId){
+
+    this.router.navigate(['/profile']);
+
+    return;
+
+  }
 
 
+  this.router.navigate([
+    '/users',
+    user.id
+  ]);
 
+}
+
+loadCurrentUser(){
+
+    this.userService
+    .getProfile()
+    .subscribe({
+
+      next:(data:any)=>{
+
+        this.currentUserId =
+          Number(data.user.id);
+
+      },
+
+      error:(err)=>{
+
+        console.error(
+          "Erreur récupération utilisateur connecté",
+          err
+        );
+
+      }
+
+    });
+
+  }
 
 
 

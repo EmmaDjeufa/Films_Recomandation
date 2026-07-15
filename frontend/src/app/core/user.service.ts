@@ -38,6 +38,6 @@ export class UserService {
     return this.http.put(`${this.apiUrl}/password`, { password: newPassword }, this.getHeaders());
   }
   getUserById(id: number) {
-    return this.http.get(`${this.apiUrl}/${id}`, this.getHeaders());
+    return this.http.get(`${this.apiUrl}/${id}`,this.getHeaders());
   }
 }

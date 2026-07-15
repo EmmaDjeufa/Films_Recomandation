@@ -75,6 +75,13 @@ class="verified"
 
 </span>
 
+<span
+class="me"
+*ngIf="user.id === currentUserId">
+
+⭐ Votre profil
+
+</span>
 
 </div>
 
@@ -131,9 +138,12 @@ thème(s) en commun
 
 
 <button
-[routerLink]="['/users',user.id]">
+(click)="openProfile(user)">
 
-Voir le profil
+{{ user.id === currentUserId 
+ ? 'Mon profil'
+ : 'Voir le profil'
+}}
 
 </button>
 
