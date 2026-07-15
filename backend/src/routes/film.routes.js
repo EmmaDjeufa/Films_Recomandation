@@ -20,18 +20,36 @@ const {
 /* =====================
    PUBLIC ROUTES
 ===================== */
+
 router.get('/popular', getPopularFilms);
 router.get('/top-rated', getTopRatedFilms);
 router.get('/upcoming', getUpcomingFilms);
 router.get('/search', searchMovies);
 router.get('/search/actor', searchActor);
 router.get('/genre/:genre', getMoviesByGenre);
-router.get('/:id', getMovieDetails);
+
 
 /* =====================
    PROTECTED ROUTES
 ===================== */
+
 router.use(authMiddleware);
+
+
+router.get('/recommendations', recommendFilms);
+
+router.get('/favorites', getFavorites);
+
+router.post('/favorites', addFavorite);
+
+router.delete('/favorites/:id', removeFavorite);
+
+
+/* =====================
+   DETAILS (TOUJOURS EN DERNIER)
+===================== */
+
+router.get('/:id', getMovieDetails);
 
 // sécurité forte
 router.get('/recommendations', (req, res, next) => {

@@ -108,10 +108,13 @@
 
 
         <button
-        class="favorite"
-        (click)="addFavorite(film)">
+          class="favorite"
+          [class.active]="isFavorite(film)"
+          (click)="addFavorite(film)">
 
-          ❤️
+          <span>
+            ♥
+          </span>
 
         </button>
 

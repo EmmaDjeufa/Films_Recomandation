@@ -296,33 +296,21 @@ export class ProfileComponent implements OnInit {
 
 
 
-  removeFavorite(tmdbId:number){
+  removeFavorite(tmdbId: number) {
 
+    this.favorites = this.favorites.filter(
+      f => f.tmdb_id !== tmdbId
+    );
 
     this.filmService
-    .removeFavorite(tmdbId)
-    .subscribe({
+      .removeFavorite(tmdbId)
+      .subscribe({
 
-      next:()=>{
+        error: () => {
+          this.loadProfile();
+        }
 
-
-        this.favorites =
-          this.favorites.filter(
-            f=>f.tmdb_id!==tmdbId
-          );
-
-
-      },
-
-
-      error:err=>
-        console.error(
-          "[REMOVE FAVORITE ERROR]",
-          err
-        )
-
-    });
-
+      });
 
   }
 

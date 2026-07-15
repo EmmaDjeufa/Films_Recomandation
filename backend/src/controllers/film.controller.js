@@ -101,19 +101,63 @@ const addFavorite = async (req, res) => {
 };
 
 const getFavorites = async (req, res) => {
+
+  console.log("=== GET FAVORITES ===");
+  console.log("USER:", req.user);
+
   try {
-    const userId = safeUserId(req);
+
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({
+        message:"Utilisateur absent"
+      });
+    }
+
+
+    const userId = req.user.id;
+
 
     const result = await pool.query(
-      `SELECT * FROM favorite_movies WHERE user_id=$1 ORDER BY created_at DESC`,
+      `
+      SELECT 
+        id,
+        user_id,
+        tmdb_id,
+        title,
+        poster_path,
+        created_at
+      FROM favorite_movies
+      WHERE user_id=$1
+      ORDER BY created_at DESC
+      `,
       [userId]
     );
 
+
+    console.log(
+      "FAVORITES TROUVES:",
+      result.rows.length
+    );
+
+
     res.json(result.rows);
-  } catch (err) {
-    console.error("getFavorites error:", err.message);
-    res.status(401).json({ message: "Unauthorized or session expired" });
+
+
+  } catch(err) {
+
+
+    console.error(
+      "GET FAVORITES ERROR COMPLETE:",
+      err
+    );
+
+
+    res.status(500).json({
+      message:err.message
+    });
+
   }
+
 };
 
 const removeFavorite = async (req, res) => {

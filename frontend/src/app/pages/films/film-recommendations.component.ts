@@ -42,14 +42,11 @@ export class FilmRecommendationsComponent implements OnInit, OnDestroy {
 
 
     console.log('[FILMS] INIT');
-
-
-    this.loadPopular();
-
+  
 
     this.loadFavorites();
 
-
+    this.loadPopular();
   }
 
 
@@ -88,37 +85,17 @@ export class FilmRecommendationsComponent implements OnInit, OnDestroy {
     const sub=request$
     .subscribe({
 
-      next:(response:any)=>{
-
-
-        console.log(
-          '[FILMS] réponse',
-          response
-        );
-
-
+      next: (response: any) => {
 
         this.films = Array.isArray(response)
           ? response
           : [];
 
+        this.loading = false;
 
+        this.loadFavorites();
 
-        console.log(
-          '[FILMS] Nombre:',
-          this.films.length
-        );
-
-
-
-        this.loading=false;
-
-
-
-        // force Angular à rafraîchir
         this.cd.detectChanges();
-
-
 
       },
 
@@ -195,84 +172,82 @@ export class FilmRecommendationsComponent implements OnInit, OnDestroy {
   }
 
 
+  isFavorite(film: any): boolean {
+    return this.favorites.some(f => f.tmdb_id === film.id);
+  }
 
 
+  loadFavorites(): void {
 
-  loadFavorites():void {
-
-
-    if(!this.filmService.hasAuth()){
-
-      this.favorites=[];
-
+    if (!this.filmService.hasAuth()) {
+      this.favorites = [];
       return;
-
     }
 
+    const sub = this.filmService.getFavorites()
+      .subscribe({
 
+        next: (data: any) => {
+          console.log('FAVORITES', data);
 
-    const sub=this.filmService.getFavorites()
-    .subscribe({
+          this.favorites = data ?? [];
 
-      next:(data:any)=>{
+          this.cd.detectChanges();
 
-        this.favorites=data;
+        },
 
-      },
+        error: () => {
 
-      error:()=>{
+          this.favorites = [];
 
-        this.favorites=[];
+          this.cd.detectChanges();
 
-      }
+        }
 
-
-    });
-
-
+      });
 
     this.subscriptions.add(sub);
-
 
   }
 
 
 
 
+  addFavorite(film: any): void {
 
-  addFavorite(film:any):void{
-
-
-    if(!this.filmService.hasAuth()){
-
-      console.warn(
-        'Connexion nécessaire'
-      );
-
+    if (!this.filmService.hasAuth()) {
       return;
-
     }
 
+    if (this.isFavorite(film)) {
+      return;
+    }
 
+    // Mise à jour immédiate de l'interface
+    this.favorites.push({
+      tmdb_id: film.id,
+      title: film.title,
+      poster_path: film.poster_path
+    });
 
-    const sub=this.filmService
-    .addFavorite({
+    const sub = this.filmService.addFavorite({
+      tmdb_id: film.id,
+      title: film.title,
+      poster_path: film.poster_path
+    }).subscribe({
 
-      tmdb_id:film.id,
-      title:film.title,
-      poster_path:film.poster_path
+      error: () => {
 
-    })
-    .subscribe(()=>{
+        // rollback si erreur
+        this.favorites = this.favorites.filter(
+          f => f.tmdb_id !== film.id
+        );
 
-      this.loadFavorites();
+      }
 
     });
 
-
-
     this.subscriptions.add(sub);
-
 
   }
 
