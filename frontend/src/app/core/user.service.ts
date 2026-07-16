@@ -14,6 +14,9 @@ export class UserService {
   constructor(private http: HttpClient, private auth: AuthService) { }
 
   private getHeaders() {
+    const token = this.auth.getToken();
+
+    console.log("TOKEN =", token);
     return { headers: new HttpHeaders({ Authorization: `Bearer ${this.auth.getToken()}` }) };
   }
 
