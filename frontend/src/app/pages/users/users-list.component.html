@@ -8,7 +8,15 @@
 </h2>
 
 
+<div class="search-box">
 
+  <input
+    type="text"
+    placeholder="🔍 Rechercher un utilisateur..."
+    [(ngModel)]="search"
+    (input)="filterUsers()">
+
+</div>
 
 <div
 class="loading"
@@ -25,7 +33,7 @@ Chargement des utilisateurs...
 <div
 class="users-grid"
 
-*ngIf="!loading && users.length>0">
+*ngIf="!loading && filteredUsers.length>0">
 
 
 
@@ -34,7 +42,7 @@ class="users-grid"
 <div
 class="user-card"
 
-*ngFor="let user of users">
+*ngFor="let user of filteredUsers">
 
 
 
@@ -125,7 +133,7 @@ class="theme"
 
 
 
-<p>
+<p class="common-themes">
 
 ⭐ {{user.common_themes || 0}}
 thème(s) en commun
@@ -169,7 +177,7 @@ thème(s) en commun
 
 class="empty"
 
-*ngIf="!loading && users.length===0">
+*ngIf="!loading && filteredUsers.length===0">
 
 
 Aucun utilisateur trouvé.

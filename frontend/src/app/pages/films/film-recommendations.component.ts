@@ -2,19 +2,21 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Subscription } from 'rxjs';
-
+import { FormsModule } from '@angular/forms';
 import { FilmService } from '../../core/film.service';
 
 
 @Component({
   selector: 'app-film-recommendations',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './film-recommendations.component.html',
   styleUrls: ['./film-recommendations.component.css']
 })
 export class FilmRecommendationsComponent implements OnInit, OnDestroy {
+  searchTerm:string = '';
 
+  filteredFilms:any[] = [];
 
   films:any[] = [];
 
@@ -87,15 +89,36 @@ export class FilmRecommendationsComponent implements OnInit, OnDestroy {
 
       next: (response: any) => {
 
-        this.films = Array.isArray(response)
+
+        console.log(
+          '[FILMS RESPONSE]',
+          response
+        );
+
+
+        this.films =
+          Array.isArray(response)
           ? response
-          : [];
+          : response?.results ?? [];
+
+
+
+        this.filteredFilms = [
+          ...this.films
+        ];
+
+
 
         this.loading = false;
 
+
+
         this.loadFavorites();
 
+
+
         this.cd.detectChanges();
+
 
       },
 
@@ -252,5 +275,33 @@ export class FilmRecommendationsComponent implements OnInit, OnDestroy {
   }
 
 
+  searchFilms():void {
 
+      const term =
+        this.searchTerm
+        .toLowerCase()
+        .trim();
+
+
+      if(!term){
+
+        this.filteredFilms = [
+          ...this.films
+        ];
+
+        return;
+
+      }
+
+
+
+      this.filteredFilms =
+        this.films.filter(
+          film =>
+            film.title
+            ?.toLowerCase()
+            .includes(term)
+        );
+
+    }
 }

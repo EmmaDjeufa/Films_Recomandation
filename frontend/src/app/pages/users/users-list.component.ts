@@ -12,7 +12,7 @@ import { RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 
 import { UserService } from '../../core/user.service';
-
+import { FormsModule } from '@angular/forms';
 
 
 @Component({
@@ -23,7 +23,8 @@ import { UserService } from '../../core/user.service';
 
   imports:[
     CommonModule,
-    RouterModule
+    RouterModule,
+    FormsModule
   ],
 
   templateUrl:'./users-list.component.html',
@@ -41,8 +42,8 @@ implements OnInit, OnDestroy {
 
 
   users:any[]=[];
-
-
+  filteredUsers:any[]=[];
+  search = '';
   loading=true;
   currentUserId:number|null = null;
 
@@ -163,9 +164,10 @@ loadCurrentUser(){
 
         this.users =
           Array.isArray(data)
-          ? data
-          : data?.users ?? [];
+            ? data
+            : data?.users ?? [];
 
+        this.filteredUsers = [...this.users];
 
 
         console.log(
@@ -221,7 +223,35 @@ loadCurrentUser(){
 
 
 
+  filterUsers(){
 
+    const value = this.search
+      .trim()
+      .toLowerCase();
+
+    if(!value){
+
+      this.filteredUsers = [...this.users];
+
+      return;
+
+    }
+
+    this.filteredUsers = this.users.filter(user =>
+
+      user.name?.toLowerCase().includes(value) ||
+
+      user.email?.toLowerCase().includes(value) ||
+
+      user.themes?.some((theme:string)=>
+
+        theme.toLowerCase().includes(value)
+
+      )
+
+    );
+
+  }
 
 
 

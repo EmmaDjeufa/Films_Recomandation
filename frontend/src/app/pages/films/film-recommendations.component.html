@@ -50,7 +50,23 @@
 
   </div>
 
+<div class="search-container">
 
+
+<input
+
+type="text"
+
+[(ngModel)]="searchTerm"
+
+(input)="searchFilms()"
+
+placeholder="🔎 Rechercher un film..."
+
+>
+
+
+</div>
 
 
 
@@ -74,7 +90,7 @@
 
   <div
   class="empty"
-  *ngIf="!loading && films.length === 0">
+  *ngIf="!loading && filteredFilms.length === 0">
 
 
     Aucun film trouvé
@@ -88,13 +104,13 @@
 
   <div
   class="movies-grid"
-  *ngIf="!loading && films.length > 0">
+  *ngIf="!loading && filteredFilms.length > 0">
 
 
 
     <article
     class="movie-card"
-    *ngFor="let film of films">
+    *ngFor="let film of filteredFilms">
 
 
 

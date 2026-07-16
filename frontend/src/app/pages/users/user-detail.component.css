@@ -137,3 +137,129 @@ font-size:15px;
 background:#1d4ed8;
 
 }
+
+.email{
+
+  overflow-wrap:anywhere;
+
+  word-break:break-word;
+
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width:768px){
+
+  .public-profile{
+
+    margin:20px auto;
+
+    padding:15px;
+
+  }
+
+  .back-button{
+
+    width:100%;
+
+    margin-bottom:20px;
+
+  }
+
+  .profile-card{
+
+    flex-direction:column;
+
+    text-align:center;
+
+    padding:25px 20px;
+
+    gap:20px;
+
+  }
+
+  .avatar{
+
+    width:120px;
+
+    height:120px;
+
+  }
+
+  .info{
+
+    width:100%;
+
+  }
+
+  .info h2{
+
+    font-size:26px;
+
+    margin-bottom:10px;
+
+  }
+
+  .info p{
+
+    font-size:15px;
+
+  }
+
+  .themes{
+
+    justify-content:center;
+
+    gap:8px;
+
+  }
+
+  .theme{
+
+    font-size:13px;
+
+    padding:7px 12px;
+
+  }
+
+}
+
+@media (max-width:420px){
+
+  .profile-card{
+
+    padding:20px 15px;
+
+  }
+
+  .avatar{
+
+    width:100px;
+
+    height:100px;
+
+  }
+
+  .info h2{
+
+    font-size:22px;
+
+  }
+
+  .info p{
+
+    font-size:14px;
+
+  }
+
+  .theme{
+
+    width:100%;
+
+    text-align:center;
+
+  }
+
+}

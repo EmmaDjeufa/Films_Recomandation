@@ -120,3 +120,58 @@ button:disabled {
   text-align: center;
   color: gray;
 }
+
+.user-info{
+  flex:1;
+  min-width:0;
+}
+
+.user-email{
+  margin-top:8px;
+  color:#6b7280;
+  font-size:15px;
+
+  /* Empêche le débordement */
+  overflow-wrap:anywhere;
+  word-break:break-word;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px){
+
+  .profile-card{
+
+    flex-direction:column;
+
+    text-align:center;
+
+    padding:20px 15px;
+
+  }
+
+  .avatar-section{
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+
+  }
+
+  .user-info{
+
+    width:100%;
+
+  }
+
+  .user-email{
+
+    font-size:14px;
+
+  }
+
+}
