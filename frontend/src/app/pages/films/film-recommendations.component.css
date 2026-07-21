@@ -1,17 +1,27 @@
+/* =========================
+   PAGE
+========================= */
+
 .films-page {
 
   min-height:100vh;
   background:#080b16;
   color:white;
-  padding-bottom:50px;
+  padding-bottom:80px;
+
+  overflow-x:hidden;
 
 }
 
 
+/* =========================
+ HERO
+========================= */
 
 .hero {
 
-  padding:50px 30px;
+  padding:clamp(30px,5vw,60px) 20px;
+
   text-align:center;
 
   background:
@@ -26,16 +36,16 @@
 
 .hero h1 {
 
-  font-size:45px;
+  font-size:clamp(28px,5vw,45px);
+
   margin-bottom:15px;
 
 }
 
 
-
 .hero p {
 
-  font-size:18px;
+  font-size:clamp(14px,2vw,18px);
 
 }
 
@@ -43,82 +53,41 @@
 
 
 
-.filters {
+/* =========================
+ SEARCH
+========================= */
 
-  display:flex;
-  justify-content:center;
-  gap:15px;
-  padding:30px;
-  flex-wrap:wrap;
+.search-container {
 
-}
+display:flex;
 
+justify-content:center;
 
-
-.filters button {
-
-  border:none;
-  padding:14px 25px;
-
-  border-radius:30px;
-
-  background:#1f2937;
-
-  color:white;
-
-  cursor:pointer;
-
-  font-weight:bold;
+padding:25px 15px;
 
 }
 
 
 
-.filters button.active {
-
-  background:#2563eb;
-
-}
+.search-container input {
 
 
+width:min(500px,90vw);
 
+padding:15px 22px;
 
+border-radius:30px;
 
-.loading-container {
+border:none;
 
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
+background:#111827;
 
-  padding:60px;
+color:white;
 
-}
+font-size:16px;
 
+outline:none;
 
-
-.spinner {
-
-  width:50px;
-  height:50px;
-
-  border-radius:50%;
-
-  border:5px solid #374151;
-
-  border-top-color:#2563eb;
-
-  animation:spin 1s linear infinite;
-
-}
-
-
-
-@keyframes spin {
-
-  to {
-    transform:rotate(360deg);
-  }
 
 }
 
@@ -126,30 +95,190 @@
 
 
 
-.movies-grid {
+/* =========================
+ THEMES
+========================= */
 
 
-display:grid;
+.theme-menu {
 
-grid-template-columns:
-repeat(
-auto-fill,
-minmax(220px,1fr)
-);
+display:flex;
+
+gap:12px;
+
+overflow-x:auto;
+
+padding:15px;
+
+position:sticky;
+
+top:0;
+
+background:#080b16;
+
+z-index:50;
+
+}
 
 
-gap:30px;
 
-padding:30px;
+.theme-menu::-webkit-scrollbar {
+
+height:5px;
+
+}
+
+
+.theme-menu::-webkit-scrollbar-thumb {
+
+background:#374151;
+
+border-radius:20px;
+
+}
+
+
+
+.theme-menu button {
+
+
+flex:0 0 auto;
+
+padding:12px 22px;
+
+border-radius:30px;
+
+border:none;
+
+background:#1f2937;
+
+color:white;
+
+font-weight:bold;
+
+cursor:pointer;
+
+white-space:nowrap;
+
+transition:.2s;
 
 
 }
 
 
 
+.theme-menu button:hover {
+
+background:#2563eb;
+
+}
+
+
+
+
+
+/* =========================
+ SECTION
+========================= */
+
+
+.movie-section {
+
+margin-top:35px;
+
+}
+
+
+
+.movie-section h2 {
+
+font-size:clamp(20px,3vw,30px);
+
+margin-left:25px;
+
+margin-bottom:10px;
+
+}
+
+
+
+
+
+/* =========================
+ CAROUSEL
+========================= */
+
+
+.carousel-wrapper {
+
+position:relative;
+
+}
+
+
+
+.movies-row {
+
+
+display:flex;
+
+gap:20px;
+
+overflow-x:auto;
+
+padding:
+
+20px clamp(15px,5vw,55px);
+
+
+scroll-behavior:smooth;
+
+scroll-snap-type:x mandatory;
+
+}
+
+
+
+.movies-row::-webkit-scrollbar {
+
+height:8px;
+
+}
+
+
+.movies-row::-webkit-scrollbar-track {
+
+background:#111827;
+
+}
+
+
+.movies-row::-webkit-scrollbar-thumb {
+
+background:#4b5563;
+
+border-radius:20px;
+
+}
+
+
+
+/* =========================
+ CARDS
+========================= */
 
 
 .movie-card {
+
+
+flex:
+
+0 0
+clamp(
+150px,
+18vw,
+220px
+);
 
 
 background:#111827;
@@ -158,11 +287,9 @@ border-radius:18px;
 
 overflow:hidden;
 
-box-shadow:
-0 15px 35px rgba(0,0,0,.4);
+scroll-snap-align:start;
 
-
-transition:.3s;
+transition:.25s;
 
 
 }
@@ -178,12 +305,14 @@ transform:translateY(-8px);
 
 
 
-
 .poster {
+
 
 position:relative;
 
-height:350px;
+aspect-ratio:
+
+2 / 3;
 
 }
 
@@ -193,6 +322,7 @@ height:350px;
 
 
 width:100%;
+
 height:100%;
 
 object-fit:cover;
@@ -202,43 +332,88 @@ object-fit:cover;
 
 
 
+
+
+/* =========================
+ FAVORIS
+========================= */
+
+
+.favorite {
+
+
+position:absolute;
+
+top:12px;
+
+right:12px;
+
+
+width:42px;
+
+height:42px;
+
+
+border-radius:50%;
+
+border:none;
+
+background:white;
+
+font-size:23px;
+
+cursor:pointer;
+
+
+}
+
+
+
+.favorite.active {
+
+color:#ef233c;
+
+}
+
+
+
+
 .rating {
 
 
 position:absolute;
 
-bottom:15px;
+bottom:10px;
 
-left:15px;
+left:10px;
 
-background:black;
+background:rgba(0,0,0,.75);
 
-padding:8px 12px;
+padding:6px 10px;
 
 border-radius:20px;
 
+font-size:13px;
 
 }
+
 
 
 
 
 .movie-info {
 
-
-padding:20px;
-
+padding:15px;
 
 }
 
 
 
-.movie-info h2 {
+.movie-info h3 {
 
-font-size:18px;
+font-size:16px;
 
-margin-bottom:10px;
-
+margin-bottom:8px;
 
 }
 
@@ -247,234 +422,10 @@ margin-bottom:10px;
 .movie-info p {
 
 
-color:#edeff3;
-
-font-size:14px;
-
-line-height:1.5;
-
-
-}
-
-
-.favorite {
-
-  position:absolute;
-  top:15px;
-  right:15px;
-
-  width:50px;
-  height:50px;
-
-  border:none;
-  border-radius:50%;
-
-  background:white;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  cursor:pointer;
-
-  font-size:30px;
-
-  box-shadow:
-  0 5px 15px rgba(0,0,0,.35);
-
-  transition:.25s;
-
-  z-index:5;
-
-}
-
-
-
-.favorite span {
-
-  color:#9ca3af;
-
-  line-height:1;
-
-  transition:.25s;
-
-}
-
-
-
-/* FAVORI ACTIF */
-
-.favorite.active {
-
-  background:white;
-
-}
-
-
-
-.favorite.active span {
-
-  color:#ef1b2d;
-
-  text-shadow:
-  0 2px 8px rgba(239,27,45,.5);
-
-}
-
-
-
-/* Animation au clic */
-
-.favorite:hover {
-
-  transform:scale(1.15);
-
-}
-
-
-
-.favorite:active {
-
-  transform:scale(.9);
-
-}
-
-.search-container{
-
-display:flex;
-
-justify-content:center;
-
-padding:20px 30px;
-
-}
-
-
-
-.search-container input{
-
-width:100%;
-
-max-width:500px;
-
-padding:15px 20px;
-
-border-radius:30px;
-
-border:none;
-
-font-size:16px;
-
-outline:none;
-
-background:#111827;
-
-color:white;
-
-box-shadow:
-0 5px 20px rgba(0,0,0,.3);
-
-}
-
-
-
-.search-container input::placeholder{
-
-color:#9ca3af;
-
-}
-@media(max-width:768px){
-
-
-.hero{
-
-padding:35px 20px;
-
-}
-
-
-
-.hero h1{
-
-font-size:32px;
-
-}
-
-
-
-.hero p{
-
-font-size:15px;
-
-}
-
-
-
-.filters{
-
-padding:20px 15px;
-
-gap:10px;
-
-}
-
-
-
-.filters button{
-
-width:100%;
-
-max-width:280px;
-
-padding:13px;
-
-}
-
-
-
-.movies-grid{
-
-grid-template-columns:
-repeat(
-2,
-1fr
-);
-
-gap:15px;
-
-padding:15px;
-
-}
-
-
-
-.poster{
-
-height:260px;
-
-}
-
-
-
-.movie-info{
-
-padding:15px;
-
-}
-
-
-
-.movie-info h2{
-
-font-size:16px;
-
-}
-
-
-
-.movie-info p{
-
 font-size:13px;
+
+color:#cbd5e1;
+
 
 display:-webkit-box;
 
@@ -484,54 +435,246 @@ display:-webkit-box;
 
 overflow:hidden;
 
-}
-
-
-
-.favorite{
-
-width:42px;
-
-height:42px;
-
-font-size:24px;
 
 }
 
 
 
-.rating{
 
-font-size:13px;
 
-padding:6px 10px;
+/* =========================
+ BOUTONS CAROUSEL
+========================= */
+
+
+.carousel-btn {
+
+
+position:absolute;
+
+top:45%;
+
+transform:translateY(-50%);
+
+
+width:45px;
+
+height:70px;
+
+
+border:none;
+
+border-radius:10px;
+
+
+background:
+rgba(0,0,0,.75);
+
+
+color:white;
+
+font-size:40px;
+
+cursor:pointer;
+
+z-index:20;
+
+
+}
+
+
+.carousel-btn.left {
+
+left:5px;
+
+}
+
+
+.carousel-btn.right {
+
+right:5px;
+
+}
+
+
+
+
+
+.scroll-hint {
+
+
+text-align:right;
+
+padding-right:25px;
+
+font-size:12px;
+
+color:#9ca3af;
+
+}
+
+
+
+
+
+/* =========================
+ TABLETTE
+========================= */
+
+
+@media(max-width:900px){
+
+
+.movie-card {
+
+
+flex-basis:170px;
+
+
+}
+
+
+
+.carousel-btn {
+
+
+width:35px;
+
+height:55px;
+
+font-size:30px;
+
+
+}
+
+
+}
+
+
+
+
+
+/* =========================
+ MOBILE
+========================= */
+
+
+@media(max-width:600px){
+
+
+.theme-menu {
+
+padding:12px;
+
+}
+
+
+
+.theme-menu button {
+
+padding:10px 18px;
+
+font-size:14px;
+
+}
+
+
+
+.movie-section h2 {
+
+margin-left:15px;
+
+}
+
+
+
+.movies-row {
+
+gap:14px;
+
+padding-left:15px;
+
+padding-right:15px;
+
+}
+
+
+
+.movie-card {
+
+
+flex-basis:
+
+calc(
+50vw - 25px
+);
+
+
+}
+
+
+
+.movie-info {
+
+padding:12px;
+
+}
+
+
+
+.movie-info h3 {
+
+font-size:15px;
+
+}
+
+
+
+.movie-info p {
+
+display:none;
+
+}
+
+
+
+.carousel-btn {
+
+display:none;
+
+}
+
+
+
+.scroll-hint {
+
+display:block;
+
+font-size:11px;
 
 }
 
 
 
 }
-@media(max-width:480px){
-
-
-.movies-grid{
-
-grid-template-columns:1fr;
-
-}
 
 
 
-.poster{
-
-height:380px;
-
-}
+/* =========================
+ TRES PETITS ECRANS
+========================= */
 
 
-.movie-info h2{
+@media(max-width:380px){
 
-font-size:18px;
+
+.movie-card {
+
+
+flex-basis:
+
+85vw;
+
 
 }
 

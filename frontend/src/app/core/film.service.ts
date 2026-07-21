@@ -140,4 +140,32 @@ export class FilmService {
     return this.http.get(`${this.apiUrl}/recommendations`, this.headers());
   }
 
+
+  // Récupération des thèmes depuis la base de données
+  getThemes() {
+
+    console.log('[FilmService] GET /themes');
+
+      return this.http.get<any[]>(
+      `${environment.apiUrl}/themes`
+    );
+
+  }
+
+
+  // Récupération des films selon un thème
+  getFilmsByTheme(themeId:number) {
+
+    console.log(
+      '[FilmService] GET films theme',
+      themeId
+    );
+
+    return this.http.get(
+      `${this.apiUrl}/theme/${themeId}`
+    );
+
+  }
+
+
 }

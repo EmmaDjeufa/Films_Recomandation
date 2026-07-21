@@ -1,181 +1,329 @@
 <section class="films-page">
 
 
-  <header class="hero">
+<header class="hero">
 
-    <h1>
-      🎬 ReckOMovies
-    </h1>
+<h1>
+🎬 ReckOMovies
+</h1>
 
-    <p>
-      Les films populaires, les nouveautés et les meilleurs classements.
-    </p>
+<p>
+Découvrez des films selon vos goûts.
+</p>
 
-  </header>
-
-
+</header>
 
 
-  <div class="filters">
-
-
-    <button
-      (click)="loadPopular()"
-      [class.active]="activeCategory === 'popular'">
-
-      🔥 Populaires
-
-    </button>
-
-
-
-    <button
-      (click)="loadTopRated()"
-      [class.active]="activeCategory === 'top'">
-
-      ⭐ Mieux notés
-
-    </button>
-
-
-
-    <button
-      (click)="loadUpcoming()"
-      [class.active]="activeCategory === 'upcoming'">
-
-      🚀 À venir
-
-    </button>
-
-
-  </div>
 
 <div class="search-container">
 
-
 <input
-
 type="text"
-
 [(ngModel)]="searchTerm"
-
 (input)="searchFilms()"
+placeholder="🔎 Rechercher un film"
+/>
 
-placeholder="🔎 Rechercher un film..."
+</div>
+
+
+
+
+
+<!-- MENU THEMES -->
+
+<nav class="theme-menu">
+
+<button
+*ngFor="let theme of themes"
+(click)="scrollToTheme(theme.id)"
+>
+
+{{theme.name}}
+
+</button>
+
+</nav>
+
+
+
+
+
+
+<!-- FILMS POPULAIRES -->
+
+<section
+class="movie-section"
+*ngIf="filteredFilms.length"
+>
+
+
+<h2>
+🔥 Populaires
+</h2>
+
+
+
+<div class="carousel-wrapper">
+
+
+<div class="movies-row">
+
+
+<article
+class="movie-card"
+*ngFor="let film of filteredFilms"
+>
+
+
+<div class="poster">
+
+
+<img
+
+[src]="film.poster_path 
+? 'https://image.tmdb.org/t/p/w500'+film.poster_path 
+: 'assets/no-poster.png'"
+
+[alt]="film.title"
+
+/>
+
+
+
+<button
+
+class="favorite"
+
+[class.active]="isFavorite(film)"
+
+(click)="addFavorite(film)"
 
 >
+
+♥
+
+</button>
+
+
+
+<span class="rating">
+
+⭐ {{film.vote_average || 'N/A'}}
+
+</span>
+
 
 
 </div>
 
 
 
-  <div
-  class="loading-container"
-  *ngIf="loading">
+
+<div class="movie-info">
 
 
-    <div class="spinner"></div>
-
-    <p>
-      Chargement...
-    </p>
+<h3>
+{{film.title}}
+</h3>
 
 
-  </div>
+<p>
+{{film.overview}}
+</p>
 
 
+</div>
 
 
-
-  <div
-  class="empty"
-  *ngIf="!loading && filteredFilms.length === 0">
+</article>
 
 
-    Aucun film trouvé
+</div>
 
 
-  </div>
+</div>
 
 
-
-
-
-  <div
-  class="movies-grid"
-  *ngIf="!loading && filteredFilms.length > 0">
-
-
-
-    <article
-    class="movie-card"
-    *ngFor="let film of filteredFilms">
-
-
-
-      <div class="poster">
-
-
-        <img
-        [src]="'https://image.tmdb.org/t/p/w500' + film.poster_path"
-        [alt]="film.title">
-
-
-
-        <button
-          class="favorite"
-          [class.active]="isFavorite(film)"
-          (click)="addFavorite(film)">
-
-          <span>
-            ♥
-          </span>
-
-        </button>
-
-
-
-        <span class="rating">
-
-          ⭐ {{film.vote_average || 'N/A'}}
-
-        </span>
-
-
-
-      </div>
+</section>
 
 
 
 
 
-      <div class="movie-info">
-
-
-        <h2>
-
-          {{film.title}}
-
-        </h2>
 
 
 
-        <p>
+<!-- THEMES -->
 
-          {{film.overview}}
+<section
 
-        </p>
+class="movie-section"
+
+*ngFor="let row of filmsByTheme"
+
+[id]="'theme-'+row.id"
+
+>
 
 
-      </div>
+<h2>
+
+{{row.name}}
+
+</h2>
 
 
 
-    </article>
+<div class="carousel-wrapper">
 
 
-  </div>
+
+<button
+
+class="carousel-btn left"
+
+(click)="scrollLeft(row.id)"
+
+>
+
+‹
+
+</button>
+
+
+
+
+
+<div
+
+class="movies-row"
+
+[id]="'row-'+row.id"
+
+>
+
+
+
+<article
+
+class="movie-card"
+
+*ngFor="let film of row.films"
+
+>
+
+
+
+<div class="poster">
+
+
+
+<img
+
+[src]="film.poster_path 
+? 'https://image.tmdb.org/t/p/w500'+film.poster_path 
+: 'assets/no-poster.png'"
+
+[alt]="film.title"
+
+/>
+
+
+
+
+
+<button
+
+class="favorite"
+
+[class.active]="isFavorite(film)"
+
+(click)="addFavorite(film)"
+
+>
+
+♥
+
+</button>
+
+
+
+<span class="rating">
+
+⭐ {{film.vote_average || 'N/A'}}
+
+</span>
+
+
+
+</div>
+
+
+
+
+
+<div class="movie-info">
+
+
+<h3>
+
+{{film.title}}
+
+</h3>
+
+
+
+<p>
+
+{{film.overview}}
+
+</p>
+
+
+
+</div>
+
+
+</article>
+
+
+</div>
+
+
+
+
+
+<button
+
+class="carousel-btn right"
+
+(click)="scrollRight(row.id)"
+
+>
+
+›
+
+</button>
+
+
+
+<div class="scroll-hint">
+
+Faites glisser →
+
+</div>
+
+
+
+</div>
+
+
+
+</section>
+
+
+
 
 
 </section>

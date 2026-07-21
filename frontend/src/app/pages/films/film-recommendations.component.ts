@@ -1,42 +1,56 @@
-import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  ChangeDetectorRef
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
-import { Subscription } from 'rxjs';
 import { FormsModule } from '@angular/forms';
+
+import { Subscription } from 'rxjs';
+
 import { FilmService } from '../../core/film.service';
 
 
 @Component({
   selector: 'app-film-recommendations',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule
+  ],
   templateUrl: './film-recommendations.component.html',
   styleUrls: ['./film-recommendations.component.css']
 })
-export class FilmRecommendationsComponent implements OnInit, OnDestroy {
-  searchTerm:string = '';
+export class FilmRecommendationsComponent
+implements OnInit, OnDestroy {
 
-  filteredFilms:any[] = [];
+
+  searchTerm = '';
 
   films:any[] = [];
 
+  filteredFilms:any[] = [];
+
   favorites:any[] = [];
 
-  loading:boolean = false;
+  themes:any[] = [];
 
-  activeCategory:string = 'popular';
+  filmsByTheme:any[] = [];
+
+  loading = false;
 
 
-  private subscriptions = new Subscription();
+  private subscriptions =
+    new Subscription();
 
 
 
   constructor(
     private filmService:FilmService,
-    private router:Router,
     private cd:ChangeDetectorRef
   ){}
-
 
 
 
@@ -44,11 +58,15 @@ export class FilmRecommendationsComponent implements OnInit, OnDestroy {
 
 
     console.log('[FILMS] INIT');
-  
+
 
     this.loadFavorites();
 
+    this.loadThemes();
+
     this.loadPopular();
+
+
   }
 
 
@@ -64,57 +82,156 @@ export class FilmRecommendationsComponent implements OnInit, OnDestroy {
 
 
 
-  private fetchFilms(
-    request$:any,
-    category:string
-  ):void {
+  loadThemes():void {
+
+
+    const sub =
+    this.filmService.getThemes()
+    .subscribe({
+
+      next:(themes:any[])=>{
+
+
+        console.log(
+          '[THEMES]',
+          themes
+        );
+
+
+        this.themes = themes;
+
+
+        this.loadThemeRows();
+
+
+        this.cd.detectChanges();
+
+
+      },
+
+
+      error:(err:any)=>{
+
+        console.error(
+          '[THEMES ERROR]',
+          err
+        );
+
+
+      }
+
+
+    });
+
+
+    this.subscriptions.add(sub);
+
+  }
 
 
 
-    console.log(
-      '[FILMS] Chargement:',
-      category
-    );
 
+
+
+
+loadThemeRows():void {
+
+this.filmsByTheme = [];
+
+
+this.themes.forEach(theme=>{
+
+
+const sub =
+this.filmService
+.getFilmsByTheme(theme.id)
+.subscribe({
+
+next:(films:any)=>{
+
+
+const movies =
+Array.isArray(films)
+? films
+: films?.results ?? [];
+
+
+
+this.filmsByTheme.push({
+
+id:theme.id,
+name:theme.name,
+films:movies.slice(0,20)
+
+});
+
+
+
+this.filmsByTheme.sort(
+(a,b)=>a.id-b.id
+);
+
+
+this.cd.detectChanges();
+
+
+
+},
+
+
+error:(err:any)=>{
+
+console.error(
+'[THEME ERROR]',
+theme.name,
+err
+);
+
+
+}
+
+
+
+});
+
+
+this.subscriptions.add(sub);
+
+
+
+});
+
+
+}
+
+
+
+
+
+  loadPopular():void {
 
 
     this.loading=true;
 
-    this.activeCategory=category;
 
-
-
-    const sub=request$
+    const sub =
+    this.filmService.getPopular()
     .subscribe({
 
-      next: (response: any) => {
-
-
-        console.log(
-          '[FILMS RESPONSE]',
-          response
-        );
+      next:(response:any)=>{
 
 
         this.films =
-          Array.isArray(response)
-          ? response
-          : response?.results ?? [];
+        response.results ??
+        response;
 
 
-
-        this.filteredFilms = [
+        this.filteredFilms=[
           ...this.films
         ];
 
 
-
-        this.loading = false;
-
-
-
-        this.loadFavorites();
-
+        this.loading=false;
 
 
         this.cd.detectChanges();
@@ -127,40 +244,89 @@ export class FilmRecommendationsComponent implements OnInit, OnDestroy {
 
 
         console.error(
-          '[FILMS] erreur',
           err
         );
 
 
-        this.films=[];
-
         this.loading=false;
+
+
+      }
+
+
+    });
+
+
+    this.subscriptions.add(sub);
+
+  }
+
+
+
+
+
+
+
+  loadFavorites():void {
+
+
+    if(!this.filmService.hasAuth()){
+
+      this.favorites=[];
+
+      return;
+
+    }
+
+
+
+    const sub =
+    this.filmService.getFavorites()
+    .subscribe({
+
+      next:(data:any)=>{
+
+
+        this.favorites =
+        data ?? [];
 
 
         this.cd.detectChanges();
 
-      }
+      },
 
+
+      error:(err:any)=>{
+
+
+        console.error(err);
+
+
+        this.favorites=[];
+
+
+      }
 
 
     });
 
 
-
     this.subscriptions.add(sub);
 
+
   }
 
 
 
 
 
-  loadPopular():void {
+
+  isFavorite(film:any):boolean{
 
 
-    this.fetchFilms(
-      this.filmService.getPopular(),
-      'popular'
+    return this.favorites.some(
+      f =>
+      f.tmdb_id === film.id
     );
 
 
@@ -170,138 +336,185 @@ export class FilmRecommendationsComponent implements OnInit, OnDestroy {
 
 
 
-  loadTopRated():void {
+
+  addFavorite(film:any):void{
 
 
-    this.fetchFilms(
-      this.filmService.getTopRated(),
-      'top'
-    );
+    if(!this.filmService.hasAuth()){
 
-  }
-
-
-
-
-
-  loadUpcoming():void {
-
-
-    this.fetchFilms(
-      this.filmService.getUpcoming(),
-      'upcoming'
-    );
-
-  }
-
-
-  isFavorite(film: any): boolean {
-    return this.favorites.some(f => f.tmdb_id === film.id);
-  }
-
-
-  loadFavorites(): void {
-
-    if (!this.filmService.hasAuth()) {
-      this.favorites = [];
       return;
+
     }
 
-    const sub = this.filmService.getFavorites()
-      .subscribe({
 
-        next: (data: any) => {
-          console.log('FAVORITES', data);
+    if(this.isFavorite(film)){
 
-          this.favorites = data ?? [];
-
-          this.cd.detectChanges();
-
-        },
-
-        error: () => {
-
-          this.favorites = [];
-
-          this.cd.detectChanges();
-
-        }
-
-      });
-
-    this.subscriptions.add(sub);
-
-  }
-
-
-
-
-  addFavorite(film: any): void {
-
-    if (!this.filmService.hasAuth()) {
       return;
+
     }
 
-    if (this.isFavorite(film)) {
-      return;
-    }
 
-    // Mise à jour immédiate de l'interface
+
     this.favorites.push({
-      tmdb_id: film.id,
-      title: film.title,
-      poster_path: film.poster_path
+
+      tmdb_id:film.id,
+
+      title:film.title,
+
+      poster_path:film.poster_path
+
     });
 
-    const sub = this.filmService.addFavorite({
-      tmdb_id: film.id,
-      title: film.title,
-      poster_path: film.poster_path
-    }).subscribe({
 
-      error: () => {
 
-        // rollback si erreur
-        this.favorites = this.favorites.filter(
-          f => f.tmdb_id !== film.id
+    const sub =
+    this.filmService
+    .addFavorite({
+
+      tmdb_id:film.id,
+
+      title:film.title,
+
+      poster_path:film.poster_path
+
+    })
+    .subscribe({
+
+      error:(err:any)=>{
+
+
+        console.error(err);
+
+
+        this.favorites =
+        this.favorites.filter(
+          f =>
+          f.tmdb_id !== film.id
         );
+
 
       }
 
+
     });
 
+
     this.subscriptions.add(sub);
+
 
   }
 
 
-  searchFilms():void {
-
-      const term =
-        this.searchTerm
-        .toLowerCase()
-        .trim();
-
-
-      if(!term){
-
-        this.filteredFilms = [
-          ...this.films
-        ];
-
-        return;
-
-      }
 
 
 
-      this.filteredFilms =
-        this.films.filter(
-          film =>
-            film.title
-            ?.toLowerCase()
-            .includes(term)
-        );
+
+  searchFilms():void{
+
+
+    const term =
+    this.searchTerm
+    .toLowerCase()
+    .trim();
+
+
+
+    if(!term){
+
+      this.filteredFilms=[
+        ...this.films
+      ];
+
+      return;
 
     }
+
+
+
+    this.filteredFilms =
+    this.films.filter(
+
+      film =>
+      film.title
+      ?.toLowerCase()
+      .includes(term)
+
+    );
+
+
+  }
+
+
+
+
+
+
+  trackById(
+    index:number,
+    item:any
+  ){
+
+    return item.id;
+
+  }
+  scrollToTheme(id:number):void {
+
+
+    const element =
+    document.getElementById(
+    'theme-'+id
+    );
+
+
+    if(element){
+
+    element.scrollIntoView({
+
+    behavior:'smooth',
+    block:'start'
+
+    });
+
+    }
+
+
+    }
+   scrollLeft(id:number):void {
+
+ const row =
+ document.getElementById(
+ 'row-'+id
+ );
+
+ if(row){
+
+ row.scrollBy({
+   left:-500,
+   behavior:'smooth'
+ });
+
+ }
+
+}
+
+
+
+scrollRight(id:number):void {
+
+ const row =
+ document.getElementById(
+ 'row-'+id
+ );
+
+
+ if(row){
+
+ row.scrollBy({
+   left:500,
+   behavior:'smooth'
+ });
+
+ }
+
+}
 }

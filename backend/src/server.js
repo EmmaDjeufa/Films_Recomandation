@@ -1,9 +1,6 @@
 //server.js
 
 
-//ng serve --port $PORT
-
-
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -66,11 +63,13 @@ const authRoutes = require('./routes/auth.routes');
 const userRoutes = require('./routes/user.routes');
 const filmRoutes = require('./routes/film.routes');
 const adminRoutes = require('./routes/admin.routes');
+const themeRoutes = require("./routes/theme.routes");
 
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/films', filmRoutes);
 app.use('/api/admin', adminRoutes);
+app.use("/api/themes",themeRoutes);
 
 // =====================
 // TEST ROUTE
