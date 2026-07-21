@@ -5,6 +5,7 @@
 
 Application de recommandation de films pour utilisateurs  
 (**Angular + Node.js + PostgreSQL + Cloudinary + Render**)
+https://reckomfilms.vercel.app/
 
 ---
 
