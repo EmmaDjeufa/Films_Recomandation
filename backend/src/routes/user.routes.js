@@ -3,35 +3,127 @@ const express = require('express');
 const router = express.Router();
 
 const authMiddleware = require('../middlewares/auth.middleware');
+
 const multer = require('multer');
-const upload = multer();
+
+const upload = multer({
+  limits:{
+    fileSize:5 * 1024 * 1024
+  }
+});
+
 
 const {
+
   updateProfile,
   updateThemes,
   listUsers,
-  getProfile,
   getMyProfile,
   updatePassword,
   getUserById
+
 } = require('../controllers/user.controller');
+
+
+
+
 
 router.use(authMiddleware);
 
-// Profil
-router.get('/me', getMyProfile);
 
-// Update profil (photo + name)
-router.put('/profile', upload.single('photo'), updateProfile);
 
-// Password
-router.put('/password', updatePassword);
 
-// Themes
-router.put('/themes', updateThemes);
+// ===============================
+// PROFIL CONNECTÉ
+// ===============================
 
-// Users list
-router.get('/all', listUsers);
-router.get('/:id', getUserById);
+
+router.get(
+  '/me',
+  getMyProfile
+);
+
+
+
+
+// ===============================
+// MODIFICATION PROFIL
+// ===============================
+
+
+router.put(
+
+  '/profile',
+
+  upload.single('photo'),
+
+  updateProfile
+
+);
+
+
+
+
+// ===============================
+// PASSWORD
+// ===============================
+
+
+router.put(
+
+  '/password',
+
+  updatePassword
+
+);
+
+
+
+
+// ===============================
+// THEMES FAVORIS
+// ===============================
+
+
+router.put(
+
+  '/themes',
+
+  updateThemes
+
+);
+
+
+
+
+// ===============================
+// UTILISATEURS
+// ===============================
+
+
+// pagination prévue
+router.get(
+
+  '/all',
+
+  listUsers
+
+);
+
+
+
+// profil public
+
+router.get(
+
+  '/:id',
+
+  getUserById
+
+);
+
+
+
+
 
 module.exports = router;

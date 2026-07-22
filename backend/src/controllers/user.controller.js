@@ -1,249 +1,955 @@
-//user.controller.js
+// backend/src/controllers/user.controller.js
+
 const bcrypt = require('bcrypt');
 const User = require('../models/User');
 const pool = require('../config/db');
 const { uploadProfilePhoto } = require('../utils/supabase');
 
-// Modifier le profil
+
+// =====================================================
+// UPDATE PROFIL (PHOTO + NOM)
+// =====================================================
+
 const updateProfile = async (req, res) => {
-  console.log("🔥 FILE RECEIVED:", req.file);
-  console.log("🔥 BODY:", req.body);
+
   try {
+
     const userId = req.user.id;
-    console.log("USER FROM TOKEN:", req.user);
-    const { name, password } = req.body;
 
-    console.log("🔥 FILE:", req.file);
-    console.log("🔥 BODY:", req.body);
+    console.log(
+      "[UPDATE PROFILE]",
+      userId
+    );
 
-    let password_hash = null;
 
-    if (password?.length > 0) {
-      password_hash = await bcrypt.hash(password, 10);
-    }
+    const {
+      name
+    } = req.body;
+
 
     let photo_url = null;
 
-    if (req.file) {
+
+    if(req.file){
 
       photo_url = await uploadProfilePhoto(
         req.file.buffer,
         req.file.originalname,
         req.file.mimetype,
-        req.user.id
+        userId
       );
 
-
-
       console.log(
-        "PHOTO URL GENERATED:",
+        "[PHOTO URL]",
         photo_url
       );
 
     }
 
-    const updateData = {};
 
-    if (name) updateData.name = name;
-    if (password_hash) updateData.password_hash = password_hash;
-    if(photo_url !== null){
 
-      updateData.photo_url = photo_url;
+    const updatedUser =
+      await User.updateProfile(
+        userId,
+        {
+          name: name || null,
+          photo_url
+        }
+      );
 
-    }
-
-    const updatedUser = await User.updateProfile(userId, updateData);
-
-    return res.json({
-      message: "Profil mis à jour",
-      user: updatedUser
-    });
-
-  } catch (err) {
-    console.error("🔥 UPDATE PROFILE ERROR:", err);
-    return res.status(500).json({
-      message: err.message,
-      stack: err.stack
-    });
-  }
-};
-const getProfile = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const user = await User.findById(userId);
-
-    if (!user) {
-      return res.status(404).json({ message: "Utilisateur introuvable" });
-    }
-
-    res.json(user);
-
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-const getMyProfile = async (req, res) => {
-  try {
-    const userId = req.user.id;
-
-    const user = await pool.query(
-      `SELECT id, name, email, photo_url, role, is_verified
-       FROM users
-       WHERE id=$1`,
-      [userId]
-    );
-
-    const favorites = await pool.query(
-      `SELECT * FROM favorite_movies WHERE user_id=$1`,
-      [userId]
-    );
 
     res.json({
-      user: user.rows[0],
-      favorites: favorites.rows
+
+      message:"Profil mis à jour",
+
+      user:updatedUser
+
     });
 
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-const updatePassword = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { password } = req.body;
 
-    if (!password || password.length < 6) {
-      return res.status(400).json({ message: "Mot de passe trop court" });
-    }
+  } catch(err){
 
-    const hash = await bcrypt.hash(password, 10);
-
-    await pool.query(
-      `UPDATE users SET password_hash=$1 WHERE id=$2`,
-      [hash, userId]
+    console.error(
+      "[UPDATE PROFILE ERROR]",
+      err
     );
 
-    res.json({ message: "Mot de passe mis à jour" });
 
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
+    res.status(500)
+    .json({
 
-// Ajouter/modifier thèmes préférés
-const updateThemes = async (req, res) => {
-  try {
-    const userId = req.user.id;
-    const { themeIds } = req.body; // tableau d'IDs
+      message:err.message
 
-    // Supprimer anciens thèmes
-    await pool.query('DELETE FROM user_themes WHERE user_id=$1', [userId]);
-
-    // Ajouter nouveaux
-    const insertPromises = themeIds.map(id =>
-      pool.query('INSERT INTO user_themes(user_id, theme_id) VALUES($1,$2)', [userId, id])
-    );
-    await Promise.all(insertPromises);
-
-    res.json({ message: 'Thèmes mis à jour' });
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
-};
-
-// Lister autres utilisateurs avec thèmes partagés
-const listUsers = async (req, res) => {
-  try {
-
-    const userId = req.user.id;
-
-    const users = await pool.query(`
-      SELECT
-        u.id,
-        u.name,
-        u.email,
-        u.photo_url,
-        u.is_verified
-      FROM users u
-      ORDER BY u.name ASC
-    `);
-
-    // ✅ SI VIDE → éviter crash SQL
-    const userIds = users.rows.map(u => u.id);
-
-    if (userIds.length === 0) {
-      return res.json([]);
-    }
-
-    const themesResult = await pool.query(`
-      SELECT ut.user_id, t.name
-      FROM user_themes ut
-      JOIN themes t ON t.id = ut.theme_id
-      WHERE ut.user_id = ANY($1::int[])
-    `, [userIds]);
-
-    const themesMap = {};
-
-    themesResult.rows.forEach(row => {
-      if (!themesMap[row.user_id]) themesMap[row.user_id] = [];
-      themesMap[row.user_id].push(row.name);
     });
 
-    const enriched = users.rows.map(u => ({
-      ...u,
-      themes: themesMap[u.id] || [],
-      common_themes: (themesMap[u.id] || []).length
-    }));
-
-    res.json(enriched);
-
-  } catch (err) {
-    console.error("LIST USERS ERROR:", err);
-    res.status(500).json({ message: err.message });
-  }
-};
-const getUserById = async (req, res) => {
-
-  try {
-
-    const result = await pool.query(`
-      SELECT
-        id,
-        name,
-        email,
-        photo_url,
-        role,
-        is_verified
-      FROM users
-      WHERE id = $1::int
-    `, [req.params.id]);
-
-    if (result.rows.length === 0) {
-      return res.status(404).json({ message: 'Utilisateur introuvable' });
-    }
-
-    const themes = await pool.query(`
-      SELECT t.name
-      FROM user_themes ut
-      JOIN themes t
-        ON ut.theme_id = t.id
-      WHERE ut.user_id = $1
-    `, [req.params.id]);
-
-    res.json({
-      ...result.rows[0],
-      themes: themes.rows.map(t => t.name)
-    });
-
-  } catch (err) {
-
-    console.error(err);
-    res.status(500).json({ message: err.message });
-
   }
 
 };
 
 
-module.exports = { updateProfile, updateThemes, listUsers, getProfile, getMyProfile, updatePassword, getUserById};
+
+
+// =====================================================
+// GET MON PROFIL COMPLET
+// =====================================================
+
+
+const getMyProfile = async(req,res)=>{
+
+
+try{
+
+
+const userId=req.user.id;
+
+
+console.log(
+"[PROFILE LOAD]",
+userId
+);
+
+
+
+// USER
+
+const userResult =
+await pool.query(
+
+`
+SELECT
+
+id,
+name,
+email,
+photo_url,
+role,
+is_verified,
+cinema_score
+
+FROM users
+
+WHERE id=$1
+
+`,
+[userId]
+
+);
+
+
+
+
+if(!userResult.rows.length){
+
+return res.status(404)
+.json({
+
+message:"Utilisateur introuvable"
+
+});
+
+}
+
+
+
+
+// FAVORIS
+
+const favoritesResult =
+await pool.query(
+
+`
+SELECT
+
+id,
+tmdb_id,
+title,
+poster_path,
+created_at
+
+FROM favorite_movies
+
+WHERE user_id=$1
+
+ORDER BY created_at DESC
+
+LIMIT 30
+
+`,
+[userId]
+
+);
+
+
+
+
+// THEMES FAVORIS
+
+const themesResult =
+await pool.query(
+
+`
+SELECT
+
+t.id,
+t.name,
+SUM(uts.score) AS score
+
+
+FROM user_theme_stats uts
+
+
+JOIN themes t
+
+ON t.id=uts.theme_id
+
+
+WHERE uts.user_id=$1
+
+
+GROUP BY
+t.id,
+t.name
+
+
+ORDER BY score DESC
+
+
+LIMIT 5
+
+`,
+[userId]
+
+);
+
+
+
+
+
+// UTILISATEURS COMPATIBLES
+
+const similarUsersResult =
+
+await pool.query(
+
+`
+
+SELECT
+
+u.id,
+u.name,
+u.photo_url,
+
+COUNT(
+DISTINCT ut.theme_id
+)
+
+AS common_themes
+
+
+FROM users u
+
+
+JOIN user_themes ut
+
+ON ut.user_id=u.id
+
+
+
+WHERE
+
+u.id <> $1
+
+
+AND ut.theme_id IN
+
+(
+
+SELECT theme_id
+
+FROM user_themes
+
+WHERE user_id=$1
+
+)
+
+
+
+GROUP BY
+
+u.id
+
+
+HAVING COUNT(DISTINCT ut.theme_id)>0
+
+
+ORDER BY
+
+common_themes DESC
+
+
+LIMIT 10
+
+
+`,
+
+[userId]
+
+);
+
+
+
+
+
+
+// CLASSEMENT
+
+const rankingResult =
+
+await pool.query(
+
+`
+
+SELECT position
+
+FROM
+
+(
+
+SELECT
+
+id,
+
+RANK()
+
+OVER(
+ORDER BY cinema_score DESC
+)
+
+AS position
+
+
+FROM users
+
+
+)
+
+ranking
+
+
+WHERE id=$1
+
+
+`,
+
+[userId]
+
+);
+
+
+
+
+
+// RECOMMANDATIONS TMDB
+
+const recommendations =
+await getRecommendations(userId);
+
+
+
+
+
+console.log(
+
+"[PROFILE SUCCESS]",
+
+{
+
+favorites:favoritesResult.rows.length,
+
+themes:themesResult.rows.length,
+
+similarUsers:similarUsersResult.rows.length
+
+}
+
+);
+
+
+
+
+res.json({
+
+user:userResult.rows[0],
+
+favorites:favoritesResult.rows,
+
+themes:themesResult.rows,
+
+similarUsers:similarUsersResult.rows,
+
+ranking:
+rankingResult.rows[0]?.position || null,
+
+recommendations
+
+
+});
+
+
+
+}catch(err){
+
+
+console.error(
+"[PROFILE ERROR]",
+err
+);
+
+
+res.status(500)
+.json({
+
+message:err.message
+
+});
+
+
+}
+
+
+};
+
+
+
+
+
+
+
+
+
+// =====================================================
+// RECOMMANDATIONS BASEES SUR THEMES
+// =====================================================
+
+
+const getRecommendations = async(userId)=>{
+
+
+  try{
+
+
+  const themes = await pool.query(
+
+  `
+  SELECT
+  tg.tmdb_genre_id
+
+  FROM user_theme_stats uts
+
+  JOIN tmdb_genres tg
+
+  ON tg.theme_id=uts.theme_id
+
+  WHERE uts.user_id=$1
+
+  ORDER BY uts.score DESC
+
+  LIMIT 3
+  `,
+  [userId]
+
+  );
+
+
+
+  if(!themes.rows.length){
+
+  return [];
+
+  }
+
+
+
+  const genreIds =
+  themes.rows
+  .map(g=>g.tmdb_genre_id)
+  .join(",");
+
+
+
+  const response =
+  await require('../services/tmdb.service')
+  .get(
+  "/discover/movie",
+  {
+  params:{
+  with_genres:genreIds,
+  sort_by:"popularity.desc",
+  page:1
+  }
+  }
+  );
+
+
+
+  return response.data.results.slice(0,10);
+
+
+
+  }
+  catch(err){
+
+  console.error(
+  "[RECOMMENDATION ERROR]",
+  err
+  );
+
+
+  return [];
+
+  }
+
+
+};
+
+
+
+
+
+
+
+// =====================================================
+// UPDATE THEMES
+// =====================================================
+
+
+const updateThemes = async(req,res)=>{
+
+
+try{
+
+
+const userId=req.user.id;
+
+
+const {
+themeIds
+}=req.body;
+
+
+
+if(!Array.isArray(themeIds)){
+
+return res.status(400)
+.json({
+
+message:"themeIds invalide"
+
+});
+
+}
+
+
+
+
+await pool.query(
+
+`
+DELETE FROM user_themes
+
+WHERE user_id=$1
+
+`,
+[userId]
+
+);
+
+
+
+
+
+for(const themeId of themeIds){
+
+
+await pool.query(
+
+`
+
+INSERT INTO user_themes
+
+(user_id,theme_id)
+
+VALUES($1,$2)
+
+ON CONFLICT DO NOTHING
+
+`,
+
+[
+userId,
+themeId
+]
+
+);
+
+
+}
+
+
+
+
+res.json({
+
+message:"Thèmes mis à jour"
+
+});
+
+
+
+}catch(err){
+
+
+console.error(
+"[UPDATE THEMES ERROR]",
+err
+);
+
+
+res.status(500)
+.json({
+
+message:err.message
+
+});
+
+
+}
+
+
+};
+
+
+
+
+
+
+
+
+
+// =====================================================
+// LISTE UTILISATEURS (ADMIN / RECHERCHE)
+// =====================================================
+
+
+const listUsers = async(req,res)=>{
+
+
+try{
+
+
+const limit =
+Math.min(
+parseInt(req.query.limit)||20,
+50
+);
+
+
+
+const offset =
+parseInt(req.query.offset)||0;
+
+
+
+
+const result =
+
+await pool.query(
+
+`
+
+SELECT
+
+id,
+name,
+photo_url,
+cinema_score
+
+
+FROM users
+
+
+ORDER BY cinema_score DESC
+
+
+LIMIT $1 OFFSET $2
+
+
+`,
+
+[
+limit,
+offset
+]
+
+);
+
+
+
+
+res.json(result.rows);
+
+
+
+}catch(err){
+
+
+console.error(
+"[LIST USERS ERROR]",
+err
+);
+
+
+res.status(500)
+.json({
+
+message:err.message
+
+});
+
+
+}
+
+
+};
+
+
+
+
+
+
+
+
+
+// =====================================================
+// GET USER PUBLIC
+// =====================================================
+
+
+const getUserById = async(req,res)=>{
+
+
+try{
+
+
+const id=req.params.id;
+
+
+
+const user=
+
+await pool.query(
+
+`
+
+SELECT
+
+id,
+name,
+photo_url,
+cinema_score
+
+FROM users
+
+WHERE id=$1
+
+`,
+
+[id]
+
+);
+
+
+
+if(!user.rows.length){
+
+return res.status(404)
+.json({
+
+message:"Utilisateur introuvable"
+
+});
+
+}
+
+
+
+
+const themes=
+
+await pool.query(
+
+`
+
+SELECT t.name
+
+FROM user_themes ut
+
+JOIN themes t
+
+ON t.id=ut.theme_id
+
+
+WHERE ut.user_id=$1
+
+
+`,
+
+[id]
+
+);
+
+
+
+res.json({
+
+...user.rows[0],
+
+themes:
+themes.rows.map(t=>t.name)
+
+});
+
+
+
+}catch(err){
+
+
+console.error(
+"[GET USER ERROR]",
+err
+);
+
+
+res.status(500)
+.json({
+
+message:err.message
+
+});
+
+
+}
+
+};
+
+
+
+
+
+
+
+
+
+
+// =====================================================
+// PASSWORD
+// =====================================================
+
+
+const updatePassword =
+async(req,res)=>{
+
+
+try{
+
+
+const userId=req.user.id;
+
+const {
+password
+}=req.body;
+
+
+
+if(!password || password.length<6){
+
+return res.status(400)
+.json({
+
+message:"Mot de passe trop court"
+
+});
+
+}
+
+
+
+const hash =
+await bcrypt.hash(password,10);
+
+
+
+await pool.query(
+
+`
+
+UPDATE users
+
+SET password_hash=$1
+
+WHERE id=$2
+
+`,
+
+[
+hash,
+userId
+]
+
+);
+
+
+
+res.json({
+
+message:"Mot de passe mis à jour"
+
+});
+
+
+
+}catch(err){
+
+
+res.status(500)
+.json({
+
+message:err.message
+
+});
+
+
+}
+
+
+};
+
+
+
+
+
+module.exports={
+
+updateProfile,
+
+getMyProfile,
+
+updateThemes,
+
+listUsers,
+
+getUserById,
+
+updatePassword
+
+};

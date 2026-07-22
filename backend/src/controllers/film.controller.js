@@ -1,16 +1,46 @@
 //film.controller.js
 const tmdb = require('../services/tmdb.service');
 const pool = require('../config/db');
+const {updateUserThemeStats}=require('../services/themeScore.service');
 
 // =====================
 // TMDB FILMS
 // =====================
+
 
 const safeUserId = (req) => {
   if (!req.user || !req.user.id) {
     throw new Error("User not authenticated");
   }
   return req.user.id;
+};
+const getUserFavoriteThemes = async(userId)=>{
+
+  const result = await pool.query(
+    `
+    SELECT
+      tg.theme_id,
+      COUNT(*) AS total
+
+    FROM favorite_movies fm
+
+    JOIN tmdb_genres tg
+
+    ON tg.tmdb_genre_id = ANY(fm.genres)
+
+    WHERE fm.user_id=$1
+
+    GROUP BY tg.theme_id
+
+    ORDER BY total DESC
+
+    `,
+    [userId]
+  );
+
+
+  return result.rows;
+
 };
 
 const getPopularFilms = async (req, res) => {
@@ -84,14 +114,56 @@ const addFavorite = async (req, res) => {
   try {
     const userId = safeUserId(req);
 
-    const { tmdb_id, title, poster_path } = req.body;
+    const {
+      tmdb_id,
+      title,
+      poster_path,
+      genres
+    }=req.body;
+
+
+    let movieGenres = genres;
+
+
+    if(!movieGenres || !movieGenres.length){
+
+      const movie =
+      await tmdb.get(`/movie/${tmdb_id}`);
+
+
+      movieGenres =
+      movie.data.genres.map(g=>g.id);
+
+    }
 
     await pool.query(
-      `INSERT INTO favorite_movies(user_id, tmdb_id, title, poster_path)
-       VALUES ($1,$2,$3,$4)
-       ON CONFLICT DO NOTHING`,
-      [userId, tmdb_id, title, poster_path]
-    );
+
+      `
+      INSERT INTO favorite_movies
+      (
+      user_id,
+      tmdb_id,
+      title,
+      poster_path,
+      genres
+      )
+
+      VALUES
+      ($1,$2,$3,$4,$5::integer[])
+
+      `,
+
+      [
+        userId,
+        tmdb_id,
+        title,
+        poster_path,
+        movieGenres
+      ]
+
+      );
+      await updateUserThemeStats(userId);
+      await updateCinemaScore(userId);
 
     res.json({ message: "Favori ajouté" });
   } catch (err) {
@@ -175,6 +247,10 @@ const removeFavorite = async (req, res) => {
        AND tmdb_id=$2`,
       [userId, tmdbId]
     );
+    // recalcul thèmes après suppression
+    await updateUserThemeStats(userId);
+    // recalcul score après suppression
+    await updateCinemaScore(userId);
 
     console.log(result);
 
@@ -246,32 +322,212 @@ const addFilm = async (req, res) => {
 // RECOMMENDATION
 // =====================
 
-const recommendFilms = async (req, res) => {
-  try {
-    const userId = req.user.id;
+const recommendFilms = async(req,res)=>{
 
-    const themes = await pool.query(
-      `SELECT theme_id FROM user_themes WHERE user_id=$1`,
-      [userId]
+
+  try{
+
+
+  const userId=req.user.id;
+
+
+
+  console.log(
+  "[RECOMMENDATIONS USER]",
+  userId
+  );
+
+
+
+  // récupérer les thèmes dominants
+
+  const themes =
+  await getUserFavoriteThemes(userId);
+
+
+
+  if(!themes.length){
+
+
+  const response =
+  await tmdb.get("/movie/popular");
+
+
+  return res.json(
+  response.data.results
+  );
+
+
+  }
+
+
+
+  // prendre les 3 meilleurs genres
+
+  const bestThemes =
+  themes
+  .slice(0,3)
+  .map(t=>t.theme_id);
+
+
+
+
+  const genres =
+  await pool.query(
+
+  `
+  SELECT tmdb_genre_id
+
+  FROM tmdb_genres
+
+  WHERE theme_id = ANY($1)
+
+  `,
+
+  [bestThemes]
+
+  );
+
+
+
+  const genreIds =
+  genres.rows
+  .map(g=>g.tmdb_genre_id)
+  .join(",");
+
+
+
+
+  console.log(
+  "[RECOMMEND GENRES]",
+  genreIds
+  );
+
+
+
+  const response =
+  await tmdb.get(
+  "/discover/movie",
+  {
+
+  params:{
+
+  with_genres:genreIds,
+
+  sort_by:"popularity.desc"
+
+  }
+
+  }
+  );
+
+
+
+  res.json(
+  response.data.results
+  );
+
+
+
+  }
+  catch(err){
+
+
+  console.error(
+  "[RECOMMEND ERROR]",
+  err
+  );
+
+
+  res.status(500)
+  .json({
+  message:err.message
+  });
+
+
+  }
+
+
+};
+
+const updateCinemaScore = async(userId)=>{
+
+
+  const result =
+  await pool.query(
+
+  `
+  SELECT COUNT(*) 
+
+  FROM favorite_movies
+
+  WHERE user_id=$1
+
+  `,
+  [userId]
+
+  );
+
+
+
+  const favorites =
+  parseInt(
+  result.rows[0].count
+  );
+
+
+
+  let score = favorites * 10;
+
+
+
+  await pool.query(
+
+  `
+
+  UPDATE users
+
+  SET cinema_score=$1
+
+  WHERE id=$2
+
+  `,
+
+  [
+  score,
+  userId
+  ]
+
+  );
+
+
+
+  console.log(
+  "[CINEMA SCORE UPDATED]",
+  score
+  );
+  const diversity =
+    await pool.query(
+
+    `
+    SELECT COUNT(DISTINCT unnest(genres))
+
+    FROM favorite_movies
+
+    WHERE user_id=$1
+
+    `,
+    [userId]
+
     );
 
-    const genreIds = themes.rows.map(t => t.theme_id);
 
-    if (!genreIds.length) {
-      const response = await tmdb.get("/movie/popular");
-      return res.json(response.data.results);
-    }
+    const diversityBonus =
+    parseInt(
+    diversity.rows[0].count
+    )
+    *2;
 
-    const response = await tmdb.get("/discover/movie", {
-      params: {
-        with_genres: genreIds.join(',')
-      }
-    });
-
-    res.json(response.data.results);
-  } catch (err) {
-    res.status(500).json({ message: err.message });
-  }
 };
 
 module.exports = {
@@ -286,5 +542,6 @@ module.exports = {
     recommendFilms,
     addFavorite,
     getFavorites,
-    removeFavorite
+    removeFavorite,
+    updateCinemaScore
 };

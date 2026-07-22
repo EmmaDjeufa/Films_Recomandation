@@ -4,367 +4,509 @@ import {
   ChangeDetectorRef
 } from '@angular/core';
 
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 
-import { UserService } from '../../core/user.service';
-import { FilmService } from '../../core/film.service';
+import {
+  CommonModule
+} from '@angular/common';
+
+
+import {
+  FormsModule
+} from '@angular/forms';
+
+
+import {
+  UserService
+} from '../../core/user.service';
+
+
+import {
+  FilmService
+} from '../../core/film.service';
+
+
 
 
 @Component({
-  selector: 'app-profile',
-  standalone:true,
-  imports:[
-    CommonModule,
-    FormsModule
-  ],
-  templateUrl:'./profile.component.html',
-  styleUrls:[
-    './profile.component.css'
-  ]
+
+selector:'app-profile',
+
+standalone:true,
+
+imports:[
+
+CommonModule,
+
+FormsModule
+
+],
+
+templateUrl:'./profile.component.html',
+
+styleUrls:['./profile.component.css']
+
 })
 
 
 export class ProfileComponent implements OnInit {
 
 
-  user:any = null;
 
-  favorites:any[]=[];
+user:any=null;
 
 
-  loading=true;
+favorites:any[]=[];
 
 
-  selectedFile:File|null=null;
+themes:any[]=[];
 
 
-  previewUrl:string|null=null;
+similarUsers:any[]=[];
 
 
-  newPassword='';
+recommendations:any[]=[];
 
 
-  passwordSuccess=false;
+ranking:number|null=null;
 
 
-  avatarError=false;
 
+loading=true;
 
-  readonly defaultAvatar =
-    'images/default.png';
 
 
+selectedFile:File|null=null;
 
-  constructor(
-    private userService:UserService,
-    private filmService:FilmService,
-    private cd:ChangeDetectorRef
-  ){}
 
+previewUrl:string|null=null;
 
 
-  ngOnInit(){
+avatarError=false;
 
-    this.loadProfile();
 
-  }
+passwordSuccess=false;
 
 
+newPassword='';
 
 
 
-  loadProfile(){
+readonly defaultAvatar=
+'images/default.png';
 
-    console.clear();
 
-    console.log(
-      "========== PROFILE =========="
-    );
 
 
-    this.loading=true;
+constructor(
 
+private userService:UserService,
 
+private filmService:FilmService,
 
-    this.userService
-    .getProfile()
-    .subscribe({
+private cd:ChangeDetectorRef
 
-      next:(data:any)=>{
+){}
 
 
-        console.log(
-          "[PROFILE DATA]",
-          data
-        );
 
 
-        this.user =
-          data.user ?? null;
 
+ngOnInit(){
 
-        this.favorites =
-          data.favorites ?? [];
+this.loadProfile();
 
+}
 
 
-        console.log(
-          "USER:",
-          this.user
-        );
 
 
-        console.log(
-          "FAVORITES:",
-          this.favorites.length
-        );
 
+// ===================================
+// CHARGEMENT PROFIL
+// ===================================
 
-        this.loading=false;
 
+loadProfile(){
 
 
-        this.cd.detectChanges();
+console.log(
 
+"[PROFILE] loading"
 
+);
 
-      },
 
 
-      error:(err)=>{
+this.loading=true;
 
 
-        console.error(
-          "[PROFILE ERROR]",
-          err
-        );
 
+this.userService
+.getProfile()
+.subscribe({
 
-        this.loading=false;
+next:(data)=>{
 
 
-        this.cd.detectChanges();
 
+console.log(
 
-      }
+"[PROFILE DATA]",
 
+data
 
-    });
+);
 
-  }
 
 
+this.user=data.user;
 
 
+this.favorites=
+data.favorites || [];
 
 
+this.themes=
+data.themes || [];
 
-  get avatarUrl(){
 
+this.similarUsers=
+data.similarUsers || [];
 
-    if(this.previewUrl){
 
-      return this.previewUrl;
+this.ranking=
+data.ranking;
 
-    }
 
+this.recommendations=
+data.recommendations || [];
 
-    if(
-      this.user?.photo_url &&
-      !this.avatarError
-    ){
 
-      return this.user.photo_url;
 
-    }
+this.loading=false;
 
 
-    return this.defaultAvatar;
 
-  }
+this.cd.detectChanges();
 
 
 
+},
 
 
 
+error:(err)=>{
 
-  
 
-  onFileSelected(event:any){
+console.error(
 
-    const file =
-      event.target.files?.[0];
+"[PROFILE ERROR]",
 
-    if(!file){
-      return;
-    }
+err
 
-    this.avatarError = false;
+);
 
-    this.selectedFile=file;
 
-    const reader =
-      new FileReader();
+this.loading=false;
 
-    reader.onload=()=>{
 
-      this.previewUrl =
-        reader.result as string;
 
-    };
+}
 
-    reader.readAsDataURL(file);
+});
 
-  }
+}
 
 
 
 
 
+// ===================================
+// AVATAR
+// ===================================
 
 
-  uploadPhoto(){
+get avatarUrl(){
 
 
-    if(!this.selectedFile){
+if(this.previewUrl){
 
-      return;
+return this.previewUrl;
 
-    }
+}
 
 
 
-    const formData =
-      new FormData();
+if(
 
+this.user?.photo_url &&
 
-    formData.append(
-      "photo",
-      this.selectedFile
-    );
+!this.avatarError
 
+){
 
+return this.user.photo_url;
 
-    this.userService
-    .updateProfile(formData)
-    .subscribe({
+}
 
-      next:(response:any)=>{
 
 
-        console.log(
-          "[PHOTO UPDATED]",
-          response
-        );
+return this.defaultAvatar;
 
 
-        this.selectedFile=null;
+}
 
-        this.previewUrl=null;
 
 
-        this.avatarError=false;
 
 
-        this.loadProfile();
+onFileSelected(event:any){
 
 
-      },
+const file=
+event.target.files?.[0];
 
 
-      error:(err)=>{
 
+if(!file){
 
-        console.error(
-          "[UPLOAD ERROR]",
-          err
-        );
+return;
 
+}
 
-      }
 
-    });
 
+this.selectedFile=file;
 
-  }
 
+this.avatarError=false;
 
 
 
+const reader=
+new FileReader();
 
 
 
-  removeFavorite(tmdbId: number) {
+reader.onload=()=>{
 
-    this.favorites = this.favorites.filter(
-      f => f.tmdb_id !== tmdbId
-    );
 
-    this.filmService
-      .removeFavorite(tmdbId)
-      .subscribe({
+this.previewUrl=
+reader.result as string;
 
-        error: () => {
-          this.loadProfile();
-        }
 
-      });
 
-  }
+};
 
 
 
+reader.readAsDataURL(file);
 
 
+}
 
 
-  updatePassword(){
 
 
-    if(this.newPassword.length < 6){
 
-      return;
 
-    }
+uploadPhoto(){
 
 
+if(!this.selectedFile){
 
-    this.userService
-    .updatePassword(this.newPassword)
-    .subscribe({
+return;
 
-      next:()=>{
+}
 
 
-        this.newPassword='';
 
+const formData=
+new FormData();
 
-        this.passwordSuccess=true;
 
 
+formData.append(
 
-        setTimeout(()=>{
+"photo",
 
-          this.passwordSuccess=false;
+this.selectedFile
 
-        },3000);
+);
 
 
-      },
 
 
-      error:err=>
-        console.error(
-          "[PASSWORD ERROR]",
-          err
-        )
+this.userService
+.updateProfile(formData)
 
-    });
+.subscribe({
 
+next:()=>{
 
-  }
+
+console.log(
+
+"[PHOTO UPDATED]"
+
+);
+
+
+
+this.selectedFile=null;
+
+
+this.previewUrl=null;
+
+
+this.loadProfile();
+
+
+},
+
+
+
+error:(err)=>{
+
+
+console.error(
+
+"[UPLOAD ERROR]",
+
+err
+
+);
+
+
+}
+
+});
+
+
+}
+
+
+
+
+
+
+
+// ===================================
+// FAVORIS
+// ===================================
+
+
+removeFavorite(id:number){
+
+
+
+this.favorites=
+
+this.favorites.filter(
+
+f=>f.tmdb_id!==id
+
+);
+
+
+
+this.filmService
+.removeFavorite(id)
+
+.subscribe({
+
+error:()=>{
+
+this.loadProfile();
+
+}
+
+});
+
+
+}
+
+
+
+
+
+
+
+
+
+// ===================================
+// PASSWORD
+// ===================================
+
+
+updatePassword(){
+
+
+
+if(
+
+this.newPassword.length<6
+
+){
+
+return;
+
+}
+
+
+
+this.userService
+
+.updatePassword(
+
+this.newPassword
+
+)
+
+.subscribe({
+
+next:()=>{
+
+
+this.newPassword='';
+
+
+this.passwordSuccess=true;
+
+
+
+setTimeout(()=>{
+
+
+this.passwordSuccess=false;
+
+
+},3000);
+
+
+
+},
+
+
+
+error:(err)=>{
+
+
+console.error(
+
+"[PASSWORD ERROR]",
+
+err
+
+);
+
+
+}
+
+});
+
+}
+
 
 
 

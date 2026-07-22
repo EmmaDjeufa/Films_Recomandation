@@ -1,190 +1,364 @@
 <div class="profile-page">
 
+<!-- HEADER -->
 
-  <div
-  class="profile-card"
-  *ngIf="user">
+<section class="profile-card" *ngIf="user">
 
+  <div class="avatar-section">
 
-    <div class="avatar-section">
-
-
-      <img
+    <img
       class="avatar"
       [src]="avatarUrl"
-      (error)="avatarError=true">
+      (error)="avatarError=true"
+    >
 
-
-
-      <label class="file-upload">
-
-        📸 Changer photo
-
-        <input
+    <label class="file-upload">
+      📸 Changer photo
+      <input
         type="file"
         accept="image/*"
-        (change)="onFileSelected($event)">
+        (change)="onFileSelected($event)"
+      >
+    </label>
 
-      </label>
-
-
-
-      <button
+    <button
       *ngIf="selectedFile"
       (click)="uploadPhoto()">
+      Enregistrer
+    </button>
 
-        Enregistrer la photo
-
-      </button>
+  </div>
 
 
+  <div class="user-info">
 
+    <h2>{{user.name}}</h2>
+
+    <p class="email">
+      {{user.email}}
+    </p>
+
+
+    <div class="score">
+      🏆 Score cinéma :
+      <strong>{{user.cinema_score || 0}}</strong>
     </div>
 
 
-
-
-
-    <div class="user-info">
-
-
-      <h2>
-        {{user.name}}
-      </h2>
-
-
-      <p class="user-email">
-        {{ user.email }}
-      </p>
-
-
+    <div *ngIf="ranking">
+      ⭐ Classement :
+      <strong>#{{ranking}}</strong>
     </div>
-
 
 
   </div>
 
 
+</section>
 
 
 
+<!-- REGLES -->
 
+<section class="section">
 
-  <div class="section">
+<details class="accordion">
 
+<summary>
+🏆 Comment gagner des points ?
+</summary>
 
-    <h3>
-      🎬 Vos favoris
-    </h3>
 
+<ul>
+<li>🎬 Ajouter un film : +10 points</li>
+<li>⏳ Garder un film longtemps : +5 points</li>
+<li>⭐ Noter un film : +20 points</li>
+<li>🌍 Diversifier ses genres : bonus</li>
+</ul>
 
 
-    <div
-    class="favorites-grid"
-    *ngIf="favorites.length>0;else empty">
+</details>
 
+</section>
 
-      <div
-      class="favorite-card"
-      *ngFor="let film of favorites">
 
 
 
-        <img
-        [src]="
-        'https://image.tmdb.org/t/p/w300'
-        + film.poster_path">
 
+<!-- THEMES -->
 
+<section class="section">
 
-        <div class="fav-title">
+<h3>
+🎭 Mes thèmes préférés
+</h3>
 
-          {{film.title}}
 
-        </div>
+<div class="chips">
 
+<span
+class="chip"
+*ngFor="let theme of themes">
 
+{{theme.name}}
 
-        <button
-        (click)="removeFavorite(film.tmdb_id)">
+<small>
+({{theme.score}})
+</small>
 
-          Supprimer
 
-        </button>
+</span>
 
 
+</div>
 
-      </div>
 
+<p
+class="empty"
+*ngIf="!themes.length">
 
-    </div>
+Aucun thème sélectionné
 
+</p>
 
 
+</section>
 
 
-    <ng-template #empty>
 
-      <p class="empty">
 
-        Aucun favori
 
-      </p>
+<!-- FAVORIS -->
 
+<section class="section">
 
-    </ng-template>
 
+<h3>
+❤️ Mes favoris
+</h3>
 
-  </div>
 
+<div
+class="favorites-list"
+*ngIf="favorites.length">
 
 
+<article
+class="favorite-item"
+*ngFor="let film of favorites">
 
 
+<img
+[src]="film.poster_path 
+? 'https://image.tmdb.org/t/p/w200'+film.poster_path 
+: 'assets/no-poster.png'">
 
 
-  <div class="section">
+<div class="favorite-info">
 
+<h4>
+{{film.title}}
+</h4>
 
-    <h3>
-      🔐 Sécurité du compte
-    </h3>
 
+<p>
+Ajouté le
+{{film.created_at | date:'dd/MM/yyyy'}}
+</p>
 
 
-    <div class="password-card">
+</div>
 
 
-      <input
-      [(ngModel)]="newPassword"
-      type="password"
-      placeholder="Nouveau mot de passe">
+<button
+class="delete-btn"
+(click)="removeFavorite(film.tmdb_id)">
+✖
+</button>
 
 
+</article>
 
-      <button
-      (click)="updatePassword()"
-      [disabled]="newPassword.length<6">
 
-        Mettre à jour
+</div>
 
-      </button>
 
+<p
+class="empty"
+*ngIf="!favorites.length">
 
+Aucun favori
 
-      <p
-      class="success"
-      *ngIf="passwordSuccess">
+</p>
 
-        ✔ Mot de passe mis à jour
 
-      </p>
+</section>
 
 
-    </div>
 
 
-  </div>
+
+
+<!-- RECOMMANDATIONS -->
+
+<section class="section">
+
+
+<h3>
+🍿 Recommandations
+</h3>
+
+
+
+<div
+class="recommend-box"
+*ngIf="recommendations.length">
+
+
+<div
+class="recommend-item"
+*ngFor="let film of recommendations">
+
+
+<img
+[src]="film.poster_path
+? 'https://image.tmdb.org/t/p/w200'+film.poster_path
+: 'assets/no-poster.png'">
+
+
+<h4>
+{{film.title}}
+</h4>
+
+
+</div>
+
+
+</div>
+
+
+
+<p
+class="empty"
+*ngIf="!recommendations.length">
+
+Pas encore assez de données
+
+</p>
+
+
+</section>
+
+
+
+
+
+
+<!-- UTILISATEURS -->
+
+<section class="section">
+
+
+<h3>
+🤝 Utilisateurs ayant les mêmes goûts
+</h3>
+
+
+
+<div
+class="users-row"
+*ngIf="similarUsers.length">
+
+
+<div
+class="user-mini"
+*ngFor="let u of similarUsers">
+
+
+<img
+[src]="u.photo_url || 'images/default.png'">
+
+
+<strong>
+{{u.name}}
+</strong>
+
+
+<span>
+🎬 {{u.common_themes}} thèmes communs
+</span>
+
+
+</div>
+
+
+</div>
+
+
+<p
+class="empty"
+*ngIf="!similarUsers.length">
+
+Aucun utilisateur compatible trouvé
+
+</p>
+
+
+</section>
+
+
+
+
+
+
+
+<!-- SECURITE -->
+
+<section class="section security-section">
+
+
+<details class="accordion">
+
+
+<summary>
+🔐 Sécurité
+</summary>
+
+
+<div class="password-card">
+
+
+<input
+type="password"
+[(ngModel)]="newPassword"
+placeholder="Nouveau mot de passe">
+
+
+<button
+(click)="updatePassword()"
+[disabled]="newPassword.length < 6">
+
+Modifier
+
+</button>
+
+
+<p
+class="success"
+*ngIf="passwordSuccess">
+
+✔ Mot de passe mis à jour
+
+</p>
+
+
+</div>
+
+
+</details>
+
+
+</section>
 
 
 
