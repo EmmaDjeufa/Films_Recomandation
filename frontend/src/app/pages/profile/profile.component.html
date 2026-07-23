@@ -90,7 +90,7 @@
 <section class="section">
 
 <h3>
-🎭 Mes thèmes préférés
+🎭 Mes thèmes préférés (considérant ce que vous mettez favoris)
 </h3>
 
 
@@ -132,43 +132,38 @@ Aucun thème sélectionné
 
 <section class="section">
 
+<details class="accordion favorites-accordion" [open]="favorites.length <= 6">
 
-<h3>
+<summary>
 ❤️ Mes favoris
-</h3>
-
+<span class="favorite-count">
+({{ favorites.length }})
+</span>
+</summary>
 
 <div
 class="favorites-list"
 *ngIf="favorites.length">
 
-
 <article
 class="favorite-item"
 *ngFor="let film of favorites">
 
-
 <img
-[src]="film.poster_path 
-? 'https://image.tmdb.org/t/p/w200'+film.poster_path 
+[src]="film.poster_path
+? 'https://image.tmdb.org/t/p/w200'+film.poster_path
 : 'assets/no-poster.png'">
-
 
 <div class="favorite-info">
 
-<h4>
-{{film.title}}
-</h4>
-
+<h4>{{film.title}}</h4>
 
 <p>
 Ajouté le
 {{film.created_at | date:'dd/MM/yyyy'}}
 </p>
 
-
 </div>
-
 
 <button
 class="delete-btn"
@@ -176,21 +171,19 @@ class="delete-btn"
 ✖
 </button>
 
-
 </article>
 
-
 </div>
-
 
 <p
 class="empty"
 *ngIf="!favorites.length">
 
-Aucun favori
+Vous n'avez pas encore sélectionné de film en favoris
 
 </p>
 
+</details>
 
 </section>
 
@@ -242,7 +235,7 @@ class="recommend-item"
 class="empty"
 *ngIf="!recommendations.length">
 
-Pas encore assez de données
+Pas encore assez de données, on vous connait encore très peu !
 
 </p>
 
@@ -299,7 +292,7 @@ class="user-mini"
 class="empty"
 *ngIf="!similarUsers.length">
 
-Aucun utilisateur compatible trouvé
+Encore aucun utilisateur compatible trouvé
 
 </p>
 
