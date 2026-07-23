@@ -14,7 +14,6 @@ Découvrez des films selon vos goûts.
 </header>
 
 
-
 <div class="search-container">
 
 <input
@@ -46,7 +45,17 @@ placeholder="🔎 Rechercher un film"
 </nav>
 
 
+<div
+class="loading-container"
+*ngIf="loading || themeLoading">
 
+<div class="spinner"></div>
+
+<p>
+Chargement des films...
+</p>
+
+</div>
 
 
 
@@ -247,7 +256,11 @@ class="favorite"
 
 </button>
 
-
+<button
+class="watch-btn"
+(click)="watchMovie(film)">
+▶ Regarder
+</button>
 
 <span class="rating">
 

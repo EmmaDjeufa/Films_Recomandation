@@ -37,6 +37,8 @@ implements OnInit, OnDestroy {
 
   themes:any[] = [];
 
+  themeLoading = true;
+
   filmsByTheme:any[] = [];
 
   loading = false;
@@ -136,70 +138,75 @@ implements OnInit, OnDestroy {
 
 loadThemeRows():void {
 
-this.filmsByTheme = [];
+  this.themeLoading = true;
+  this.filmsByTheme = [];
 
 
-this.themes.forEach(theme=>{
+  this.themes.forEach(theme=>{
 
 
-const sub =
-this.filmService
-.getFilmsByTheme(theme.id)
-.subscribe({
+  const sub =
+  this.filmService
+  .getFilmsByTheme(theme.id)
+  .subscribe({
 
-next:(films:any)=>{
-
-
-const movies =
-Array.isArray(films)
-? films
-: films?.results ?? [];
+  next:(films:any)=>{
 
 
-
-this.filmsByTheme.push({
-
-id:theme.id,
-name:theme.name,
-films:movies.slice(0,20)
-
-});
+  const movies =
+  Array.isArray(films)
+  ? films
+  : films?.results ?? [];
 
 
 
-this.filmsByTheme.sort(
-(a,b)=>a.id-b.id
-);
+  this.filmsByTheme.push({
+
+  id:theme.id,
+  name:theme.name,
+  films:movies.slice(0,20)
+
+  });
+
+  if (this.filmsByTheme.length === this.themes.length) {
+
+    this.themeLoading = false;
+
+  }
+
+  this.filmsByTheme.sort(
+  (a,b)=>a.id-b.id
+  );
 
 
-this.cd.detectChanges();
-
-
-
-},
-
-
-error:(err:any)=>{
-
-console.error(
-'[THEME ERROR]',
-theme.name,
-err
-);
-
-
-}
-
-
-
-});
-
-
-this.subscriptions.add(sub);
+  this.cd.detectChanges();
 
 
 
-});
+  },
+
+
+  error:(err:any)=>{
+
+  console.error(
+  '[THEME ERROR]',
+  theme.name,
+  err
+  );
+
+
+  }
+
+
+
+  });
+
+
+  this.subscriptions.add(sub);
+
+
+
+  });
 
 
 }
@@ -517,4 +524,16 @@ scrollRight(id:number):void {
  }
 
 }
+
+  watchMovie(film:any):void{
+
+    window.open(
+
+    `https://www.themoviedb.org/movie/${film.id}/watch`,
+
+    '_blank'
+
+    );
+
+  }
 }
