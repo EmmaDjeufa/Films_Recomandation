@@ -1,190 +1,124 @@
 <!-- users-list.component.html  -->
 <div class="users-container">
 
+    <h2>👥 Découvrir des utilisateurs</h2>
 
+    <div class="search-box">
+        <input
+            type="text"
+            placeholder="🔍 Rechercher un utilisateur..."
+            [(ngModel)]="search"
+            (input)="filterUsers()">
+    </div>
 
-<h2>
-👥 Découvrir des utilisateurs
-</h2>
+    <div class="loading" *ngIf="loading">
+        Chargement...
+    </div>
 
+    <div
+        class="users-grid"
+        *ngIf="!loading && filteredUsers.length">
 
-<div class="search-box">
+        <article
+            class="user-card"
+            *ngFor="let user of filteredUsers">
 
-  <input
-    type="text"
-    placeholder="🔍 Rechercher un utilisateur..."
-    [(ngModel)]="search"
-    (input)="filterUsers()">
+            <img
+                class="avatar"
+                [src]="user.photo_url || 'images/default.png'"
+                [alt]="user.name">
 
-</div>
+            <div class="content">
 
-<div
-class="loading"
-*ngIf="loading">
+                <div class="header">
 
-Chargement des utilisateurs...
+                    <h3>{{user.name}}</h3>
 
-</div>
+                    <span
+                       
+                      class="me"
+                      *ngIf="user.id === currentUserId">
 
+                      ⭐ Vous
 
+                    </span>
 
+                </div>
 
+                <p class="email">
+                    📧 {{user.email}}
+                </p>
 
-<div
-class="users-grid"
+                <div class="stats">
 
-*ngIf="!loading && filteredUsers.length>0">
+                    <span class="score">
+                        🏆 {{user.cinema_score || 0}}
+                    </span>
 
+                    <span
+                        class="verified"
+                        *ngIf="user.is_verified">
 
+                        ✔ Vérifié
 
+                    </span>
 
+                </div>
 
-<div
-class="user-card"
+                <div
+                    class="themes"
+                    *ngIf="user.themes?.length">
 
-*ngFor="let user of filteredUsers">
+                    
 
+                </div>
 
+                <div 
+                  class="common-themes"
+                  *ngIf="user.common_themes > 0">
 
 
+                  ⭐
 
-<img
+                  <strong>
+                    {{user.common_themes}}
+                  </strong>
 
-class="avatar"
+                  thème(s) en commun
 
-[src]="user.photo_url || 'images/default.png'"
 
->
+                  </div>
 
 
+                  <div
+                    class="common-themes empty-common"
+                    *ngIf="!user.common_themes">
 
+                    Aucun thème commun
 
+                  </div>
 
+                <button
+                    (click)="openProfile(user)">
 
-<div class="content">
+                    {{ user.id === currentUserId
+                        ? 'Mon profil'
+                        : 'Voir le profil' }}
 
+                </button>
 
+            </div>
 
-<div class="header">
+        </article>
 
+    </div>
 
-<h3>
-{{user.name}}
-</h3>
+    <div
+        class="empty"
+        *ngIf="!loading && !filteredUsers.length">
 
+        Aucun utilisateur trouvé.
 
-
-<span
-class="verified"
-
-*ngIf="user.is_verified">
-
-✔ Vérifié
-
-</span>
-
-<span
-class="me"
-*ngIf="user.id === currentUserId">
-
-⭐ Votre profil
-
-</span>
-
-</div>
-
-
-
-
-
-<p class="email">
-
-📧 {{user.email}}
-
-</p>
-
-
-
-
-
-
-<div
-class="themes"
-
-*ngIf="user.themes?.length">
-
-
-<span
-class="theme"
-
-*ngFor="let theme of user.themes">
-
-
-🎬 {{theme}}
-
-
-</span>
-
-
-</div>
-
-
-
-
-
-
-<p class="common-themes">
-
-⭐ {{user.common_themes || 0}}
-thème(s) en commun
-
-</p>
-
-
-
-
-
-
-<button
-(click)="openProfile(user)">
-
-{{ user.id === currentUserId 
- ? 'Mon profil'
- : 'Voir le profil'
-}}
-
-</button>
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-
-
-
-
-<div
-
-class="empty"
-
-*ngIf="!loading && filteredUsers.length===0">
-
-
-Aucun utilisateur trouvé.
-
-
-</div>
-
-
+    </div>
 
 </div>

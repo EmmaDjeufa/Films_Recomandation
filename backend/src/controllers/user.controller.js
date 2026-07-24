@@ -189,30 +189,18 @@ await pool.query(
 
 `
 SELECT
-
-t.id,
-t.name,
-SUM(uts.score) AS score
-
+    t.id,
+    t.name,
+    uts.score
 
 FROM user_theme_stats uts
 
-
 JOIN themes t
+ON t.id = uts.theme_id
 
-ON t.id=uts.theme_id
+WHERE uts.user_id = $1
 
-
-WHERE uts.user_id=$1
-
-
-GROUP BY
-t.id,
-t.name
-
-
-ORDER BY score DESC
-
+ORDER BY uts.score DESC
 
 LIMIT 5
 
@@ -228,72 +216,51 @@ LIMIT 5
 // UTILISATEURS COMPATIBLES
 
 const similarUsersResult =
-
 await pool.query(
-
 `
-
 SELECT
 
 u.id,
 u.name,
 u.photo_url,
+u.cinema_score,
 
-COUNT(
-DISTINCT ut.theme_id
-)
-
-AS common_themes
-
+COUNT(DISTINCT uts.theme_id) AS common_themes
 
 FROM users u
 
-
-JOIN user_themes ut
-
-ON ut.user_id=u.id
-
-
+JOIN user_theme_stats uts
+ON uts.user_id = u.id
 
 WHERE
 
 u.id <> $1
 
+AND uts.theme_id IN (
 
-AND ut.theme_id IN
-
-(
-
-SELECT theme_id
-
-FROM user_themes
-
-WHERE user_id=$1
+    SELECT theme_id
+    FROM user_theme_stats
+    WHERE user_id = $1
 
 )
 
-
-
 GROUP BY
 
-u.id
+u.id,
+u.name,
+u.photo_url,
+u.cinema_score
 
-
-HAVING COUNT(DISTINCT ut.theme_id)>0
-
+HAVING COUNT(DISTINCT uts.theme_id) > 0
 
 ORDER BY
 
-common_themes DESC
-
+common_themes DESC,
+u.cinema_score DESC
 
 LIMIT 10
-
-
 `,
-
 [userId]
-
 );
 
 
@@ -353,10 +320,6 @@ WHERE id=$1
 
 const recommendations =
 await getRecommendations(userId);
-
-
-
-
 
 console.log(
 
@@ -641,87 +604,133 @@ message:err.message
 // =====================================================
 
 
-const listUsers = async(req,res)=>{
+const listUsers = async (req, res) => {
+
+  try {
+
+    const limit = Math.min(
+      parseInt(req.query.limit) || 20,
+      50
+    );
+
+    const offset =
+      parseInt(req.query.offset) || 0;
 
 
-try{
-
-
-const limit =
-Math.min(
-parseInt(req.query.limit)||20,
-50
-);
-
-
-
-const offset =
-parseInt(req.query.offset)||0;
-
-
-
-
-const result =
-
-await pool.query(
-
-`
-
-SELECT
-
-id,
-name,
-photo_url,
-cinema_score
-
-
-FROM users
-
-
-ORDER BY cinema_score DESC
-
-
-LIMIT $1 OFFSET $2
-
-
-`,
-
-[
-limit,
-offset
-]
-
-);
+    const currentUserId =
+      req.user.id;
 
 
 
+    const result = await pool.query(
+      `
 
-res.json(result.rows);
+      SELECT
 
-
-
-}catch(err){
-
-
-console.error(
-"[LIST USERS ERROR]",
-err
-);
-
-
-res.status(500)
-.json({
-
-message:err.message
-
-});
+      u.id,
+      u.name,
+      u.email,
+      u.photo_url,
+      u.is_verified,
+      u.cinema_score,
 
 
-}
+      COALESCE(
 
+        ARRAY_AGG(DISTINCT t.name)
+        FILTER(
+          WHERE t.name IS NOT NULL
+        ),
+
+        '{}'
+
+      ) AS themes,
+
+
+      COUNT(
+        DISTINCT common.theme_id
+      ) AS common_themes
+
+
+      FROM users u
+
+
+
+      LEFT JOIN user_theme_stats uts
+
+      ON uts.user_id=u.id
+
+
+
+      LEFT JOIN themes t
+
+      ON t.id=uts.theme_id
+
+
+
+
+      LEFT JOIN user_theme_stats common
+
+      ON common.theme_id = uts.theme_id
+
+      AND common.user_id = $3
+
+
+
+      GROUP BY
+
+      u.id,
+      u.name,
+      u.email,
+      u.photo_url,
+      u.is_verified,
+      u.cinema_score
+
+
+
+      ORDER BY
+
+      u.cinema_score DESC,
+      u.name ASC
+
+
+
+      LIMIT $1
+      OFFSET $2
+
+
+      `,
+
+      [
+        limit,
+        offset,
+        currentUserId
+      ]
+
+    );
+
+
+    res.json(result.rows);
+
+
+
+  } catch(err){
+
+    console.error(
+      "[LIST USERS ERROR]",
+      err
+    );
+
+
+    res.status(500).json({
+
+      message:err.message
+
+    });
+
+  }
 
 };
-
 
 
 
@@ -743,6 +752,8 @@ try{
 
 const id=req.params.id;
 
+const currentUserId=req.user.id;
+
 
 
 const user=
@@ -750,7 +761,6 @@ const user=
 await pool.query(
 
 `
-
 SELECT
 
 id,
@@ -763,7 +773,6 @@ FROM users
 WHERE id=$1
 
 `,
-
 [id]
 
 );
@@ -790,16 +799,27 @@ await pool.query(
 
 `
 
-SELECT t.name
+SELECT
 
-FROM user_themes ut
+t.name,
+uts.score
+
+
+FROM user_theme_stats uts
+
 
 JOIN themes t
 
-ON t.id=ut.theme_id
+ON t.id = uts.theme_id
 
 
-WHERE ut.user_id=$1
+WHERE uts.user_id=$1
+
+
+ORDER BY uts.score DESC
+
+
+LIMIT 5
 
 
 `,
@@ -810,12 +830,71 @@ WHERE ut.user_id=$1
 
 
 
+
+// THEMES COMMUNS
+
+const commonThemes =
+
+await pool.query(
+
+`
+
+SELECT
+
+t.name
+
+
+FROM user_theme_stats uts
+
+
+JOIN themes t
+
+ON t.id = uts.theme_id
+
+
+
+WHERE
+
+uts.user_id=$1
+
+
+AND uts.theme_id IN
+
+(
+
+SELECT theme_id
+
+FROM user_theme_stats
+
+WHERE user_id=$2
+
+)
+
+
+ORDER BY t.name
+
+
+`,
+
+[
+id,
+currentUserId
+]
+
+);
+
+
+
+
 res.json({
 
 ...user.rows[0],
 
-themes:
-themes.rows.map(t=>t.name)
+themes:themes.rows,
+
+commonThemes:
+commonThemes.rows
+
 
 });
 
@@ -840,8 +919,8 @@ message:err.message
 
 }
 
-};
 
+};
 
 
 

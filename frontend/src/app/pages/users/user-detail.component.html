@@ -1,91 +1,237 @@
 <div class="public-profile">
-  <button
-    class="back-button"
-    (click)="goBackUsers()">
 
-        ← Retour aux utilisateurs
 
-  </button>
+<button
+class="back-button"
+(click)="goBackUsers()">
 
-  <div
-  class="loading"
-  *ngIf="loading">
+← Retour aux utilisateurs
 
-    Chargement du profil...
-
-  </div>
+</button>
 
 
 
-  <div
-  class="profile-card"
-  *ngIf="user && !loading">
+<div
+class="loading"
+*ngIf="loading">
 
+Chargement du profil...
 
-    <img
-
-    class="avatar"
-
-    [src]="user.photo_url || 'images/default.png'"
-
-    >
-
-
-
-    <div class="info">
-
-
-      <h2>
-        {{user.name}}
-      </h2>
-
-
-
-      <p class="email">
-        📧 {{user.email}}
-      </p>
+</div>
 
 
 
 
-      <h3>
-        🎬 Thèmes favoris
-      </h3>
+
+<section
+class="profile-card"
+
+*ngIf="user && !loading">
 
 
 
-      <div
-      class="themes"
-      *ngIf="user.themes?.length">
+<div class="avatar-section">
 
 
-        <span
-        class="theme"
-        *ngFor="let t of user.themes">
+<img
 
-          {{t}}
+class="avatar"
 
-        </span>
+[src]="user.photo_url || 'images/default.png'"
 
+[alt]="user.name"
 
-      </div>
-
+>
 
 
-      <p
-      *ngIf="!user.themes?.length">
-
-        Aucun thème renseigné
-
-      </p>
+</div>
 
 
 
-    </div>
 
 
-  </div>
 
+<div class="info">
+
+
+
+<div class="title-row">
+
+<h2>
+
+{{user.name}}
+
+</h2>
+
+
+<span class="score-badge">
+
+🏆 {{user.cinema_score || 0}}
+
+</span>
+
+
+</div>
+
+
+
+
+
+<h3>
+🎭 Thèmes favoris
+</h3>
+
+
+
+<div
+
+class="themes"
+
+*ngIf="user.themes?.length">
+
+
+<span
+
+class="theme"
+
+*ngFor="let t of user.themes">
+
+
+🎬 {{t.name}}
+
+<small>
+
+{{t.score}}
+
+</small>
+
+
+</span>
+
+
+</div>
+
+
+
+
+<p
+
+class="empty"
+
+*ngIf="!user.themes?.length">
+
+Aucun thème renseigné
+
+</p>
+
+
+
+
+
+
+<section
+
+class="common-section"
+
+*ngIf="user.commonThemes?.length">
+
+
+<h3>
+
+🤝 Vos thèmes communs
+
+</h3>
+
+
+
+<div class="themes">
+
+
+<span
+
+class="theme common"
+
+*ngFor="let t of user.commonThemes">
+
+
+⭐ {{t.name}}
+
+
+</span>
+
+
+</div>
+
+
+</section>
+
+
+
+
+
+<p
+
+class="empty"
+
+*ngIf="!user.commonThemes?.length">
+
+Aucun thème commun détecté
+
+</p>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+<details class="score-info">
+
+
+<summary>
+
+🎬 Comment fonctionne le score cinéma ?
+
+</summary>
+
+
+<ul>
+
+
+<li>
+❤️ Ajouter un film favori : +10 points
+</li>
+
+
+<li>
+⭐ Noter un film : +20 points
+</li>
+
+
+<li>
+🎭 Explorer plusieurs genres : bonus diversité
+</li>
+
+
+<li>
+🔥 Activité régulière : bonus fidélité
+</li>
+
+
+</ul>
+
+
+</details>
+
+
+
+
+</section>
 
 
 </div>

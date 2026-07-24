@@ -1,61 +1,115 @@
+/* =========================
+   PAGE
+========================= */
+
 .users-container{
-  max-width:1100px;
-  margin:auto;
-  padding:40px 20px;
+
+max-width:1200px;
+margin:auto;
+padding:20px;
+
 }
-
-
 
 h2{
 
 text-align:center;
-
-margin-bottom:35px;
+margin-bottom:30px;
+font-size:32px;
 
 }
 
+/* =========================
+   RECHERCHE
+========================= */
 
+.search-box{
 
+display:flex;
+justify-content:center;
+margin-bottom:30px;
 
+}
+
+.search-box input{
+
+width:100%;
+max-width:520px;
+
+padding:14px 20px;
+
+border:2px solid #dbeafe;
+border-radius:999px;
+
+background:white;
+
+font-size:16px;
+
+outline:none;
+
+transition:.25s;
+
+box-sizing:border-box;
+
+}
+
+.search-box input::placeholder{
+
+color:#9ca3af;
+
+}
+
+.search-box input:focus{
+
+border-color:#2563eb;
+box-shadow:0 0 0 4px rgba(37,99,235,.12);
+
+}
+
+/* =========================
+   ETATS
+========================= */
 
 .loading,
 .empty{
 
 text-align:center;
-
 padding:50px;
 
 color:#6b7280;
 
+font-size:17px;
+
 }
 
-
-
+/* =========================
+   LISTE
+========================= */
 
 .users-grid{
 
 display:grid;
 
 grid-template-columns:
+repeat(auto-fit,minmax(320px,1fr));
 
-repeat(auto-fill,minmax(320px,1fr));
-
-gap:25px;
+gap:22px;
 
 }
 
-
-
+/* =========================
+   CARTE
+========================= */
 
 .user-card{
 
 display:flex;
+align-items:flex-start;
 
-gap:20px;
+gap:18px;
 
 background:white;
 
-padding:25px;
+padding:22px;
 
 border-radius:20px;
 
@@ -66,24 +120,20 @@ transition:.25s;
 
 }
 
-
-
-
 .user-card:hover{
 
 transform:translateY(-5px);
 
 }
 
-
-
-
+/* =========================
+   AVATAR
+========================= */
 
 .avatar{
 
-width:90px;
-
-height:90px;
+width:85px;
+height:85px;
 
 border-radius:50%;
 
@@ -91,77 +141,85 @@ object-fit:cover;
 
 border:3px solid #2563eb;
 
+flex-shrink:0;
+
 }
 
-
-
-
+/* =========================
+   CONTENU
+========================= */
 
 .content{
-  flex:1;
-  min-width:0;
+
+flex:1;
+min-width:0;
+
 }
-
-
-
-
 
 .header{
 
 display:flex;
-
 justify-content:space-between;
-
 align-items:center;
 
+gap:10px;
+
+margin-bottom:8px;
+
+flex-wrap:wrap;
+
 }
-
-
-
 
 .header h3{
 
 margin:0;
 
+font-size:22px;
+
 }
 
+.verified{
 
+color:#16a34a;
+font-weight:700;
 
+}
 
+.me{
+
+color:#f59e0b;
+font-weight:700;
+
+}
 
 .email{
 
-color:#6b7280;
+margin:8px 0;
 
 font-size:14px;
 
-margin:8px 0;
+color:#6b7280;
 
 overflow-wrap:anywhere;
-
 word-break:break-word;
 
 }
 
-
-
-
+/* =========================
+   THEMES
+========================= */
 
 .themes{
 
 display:flex;
 
-gap:8px;
-
 flex-wrap:wrap;
+
+gap:8px;
 
 margin:15px 0;
 
 }
-
-
-
-
 
 .theme{
 
@@ -171,238 +229,296 @@ color:#2563eb;
 
 padding:6px 12px;
 
-border-radius:20px;
+border-radius:999px;
 
 font-size:13px;
 
 }
 
+/* =========================
+   SCORE COMMUN
+========================= */
 
+.common-themes{
 
+margin-top:10px;
 
+font-weight:600;
 
-.verified{
-
-color:#16a34a;
-
-font-weight:bold;
+color:#374151;
 
 }
 
-
-
+/* =========================
+   BOUTON
+========================= */
 
 button{
+
+width:100%;
+
+margin-top:18px;
+
+padding:11px;
+
+border:none;
+
+border-radius:10px;
 
 background:#2563eb;
 
 color:white;
 
-border:none;
-
-padding:12px 16px;
-
-border-radius:10px;
+font-weight:600;
 
 cursor:pointer;
-
-width:100%;
-
-margin-top:15px;
-
-font-weight:600;
 
 transition:.25s;
 
 }
 
+button:hover{
+
+background:#1d4ed8;
+
+}
+
+/* =========================
+   TABLETTE
+========================= */
+
+@media(max-width:768px){
+
+.users-container{
+
+padding:15px;
+
+}
+
+h2{
+
+font-size:28px;
+
+}
+
+.users-grid{
+
+grid-template-columns:1fr;
+
+gap:18px;
+
+}
+
+.user-card{
+
+padding:18px;
+
+gap:15px;
+
+}
+
+.avatar{
+
+width:75px;
+height:75px;
+
+}
+
+.header h3{
+
+font-size:20px;
+
+}
+
+button{
+
+padding:10px;
+
+}
+
+}
+
+/* =========================
+   TELEPHONE
+========================= */
+
+@media(max-width:600px){
+
+.users-container{
+
+padding:10px;
+
+}
+
+.search-box{
+
+margin-bottom:20px;
+
+}
+
+.search-box input{
+
+padding:12px 16px;
+
+font-size:14px;
+
+}
+
+.user-card{
+
+padding:14px;
+
+gap:12px;
+
+}
+
+.avatar{
+
+width:65px;
+height:65px;
+
+}
+
+.header h3{
+
+font-size:17px;
+
+}
+
+.email{
+
+font-size:12px;
+
+}
+
+.theme{
+
+font-size:11px;
+
+padding:5px 9px;
+
+}
+
 .common-themes{
 
-margin-top:12px;
+font-size:12px;
 
-font-weight:500;
+}
+
+button{
+
+padding:9px;
+
+font-size:13px;
+
+margin-top:14px;
+
+}
+
+}
+
+/* =========================
+   TRES PETITS ECRANS
+========================= */
+
+@media(max-width:380px){
+
+.user-card{
+
+flex-direction:column;
+
+align-items:center;
+
+text-align:center;
+
+}
+
+.content{
+
+width:100%;
+
+}
+
+.header{
+
+justify-content:center;
+
+}
+
+.themes{
+
+justify-content:center;
+
+}
+
+}
+
+
+.stats{
+
+display:flex;
+flex-wrap:wrap;
+gap:10px;
+margin:8px 0 15px;
+
+}
+
+.score,
+.verified,
+.me{
+
+padding:6px 10px;
+border-radius:999px;
+font-size:13px;
+font-weight:600;
+
+}
+
+.score{
+
+background:#eff6ff;
+color:#2563eb;
+
+}
+
+.verified{
+
+background:#ecfdf5;
+color:#16a34a;
+
+}
+
+.me{
+
+background:#fff7ed;
+color:#ea580c;
+
+}
+
+.common-themes{
+
+margin-top:15px;
+
+font-weight:600;
 
 color:#374151;
 
 }
 
 
-/* ===========================
-   RESPONSIVE
-=========================== */
+.empty-common{
 
-@media (max-width:768px){
+color:#9ca3af;
 
-  .users-container{
-
-    padding:20px 15px;
-
-  }
-
-  .search-box{
-
-  display:flex;
-
-  justify-content:center;
-
-  margin-bottom:35px;
+font-size:14px;
 
 }
 
-.search-box input{
 
-  width:100%;
+.common{
 
-  max-width:500px;
+background:#fff7ed;
 
-  padding:14px 18px;
+color:#ea580c;
 
-  border-radius:30px;
-
-  border:2px solid #dbeafe;
-
-  font-size:15px;
-
-  outline:none;
-
-  transition:.25s;
-
-}
-
-.search-box input:focus{
-
-  border-color:#2563eb;
-
-  box-shadow:0 0 0 4px rgba(37,99,235,.12);
-
-}
-
-  .users-grid{
-
-    grid-template-columns:1fr;
-
-    gap:20px;
-
-  }
-
-  .user-card{
-
-    flex-direction:column;
-
-    align-items:center;
-
-    text-align:center;
-
-    padding:20px;
-
-  }
-
-  .avatar{
-
-    width:110px;
-
-    height:110px;
-
-  }
-
-  .content{
-
-    width:100%;
-
-  }
-
-  .header{
-
-    flex-direction:column;
-
-    gap:8px;
-
-  }
-
-  .themes{
-
-    justify-content:center;
-
-  }
-
-}/* ===========================
-   SEARCH BOX
-=========================== */
-
-.search-box{
-  display:flex;
-  justify-content:center;
-  margin-bottom:35px;
-  width:100%;
-}
-
-.search-box input{
-  width:100%;
-  max-width:520px;
-  padding:14px 20px;
-  font-size:16px;
-  border:2px solid #dbeafe;
-  border-radius:999px;
-  outline:none;
-  background:#fff;
-  transition:all .25s ease;
-  box-sizing:border-box;
-}
-
-.search-box input::placeholder{
-  color:#9ca3af;
-}
-
-.search-box input:focus{
-  border-color:#2563eb;
-  box-shadow:0 0 0 4px rgba(37,99,235,.12);
-}/* ===========================
-   RESPONSIVE
-=========================== */
-
-@media (max-width:768px){
-
-  .users-container{
-    padding:20px 15px;
-  }
-
-  .search-box{
-    margin-bottom:25px;
-  }
-
-  .search-box input{
-    max-width:100%;
-    padding:13px 16px;
-    font-size:15px;
-  }
-
-  .users-grid{
-    grid-template-columns:1fr;
-    gap:20px;
-  }
-
-  .user-card{
-    flex-direction:column;
-    align-items:center;
-    text-align:center;
-    padding:20px;
-  }
-
-  .avatar{
-    width:110px;
-    height:110px;
-  }
-
-  .content{
-    width:100%;
-  }
-
-  .header{
-    flex-direction:column;
-    gap:8px;
-  }
-
-  .themes{
-    justify-content:center;
-  }
 }

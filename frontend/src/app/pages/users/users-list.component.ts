@@ -78,7 +78,7 @@ implements OnInit, OnDestroy {
 
 openProfile(user:any){
 
-  if(user.id === this.currentUserId){
+  if(Number(user.id) === this.currentUserId){
 
     this.router.navigate(['/profile']);
 
@@ -163,9 +163,16 @@ loadCurrentUser(){
         */
 
         this.users =
-          Array.isArray(data)
+          (Array.isArray(data)
             ? data
-            : data?.users ?? [];
+            : data?.users ?? [])
+            .map((user:any)=>({
+
+              ...user,
+
+              id:Number(user.id)
+
+            }));
 
         this.filteredUsers = [...this.users];
 
